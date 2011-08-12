@@ -149,14 +149,16 @@ var DerpScrubber = (function() {
   },
   
   disable: function() {
-   this.outer.unbind("mousedown");
+   if (typeof(this.dragHandler) == "function")
+    this.root.unbind(this.dragHandler);
    this.highlight.css("display", "none");
    return this;
   },
  
   enable: function() {
+   this.dragHandler = this.makeDragHandler();
    this.highlight.css("display", "block");
-   this.outer.mousedown(this.makeDragHandler());
+   this.root.mousedown(this.dragHandler);
    this.onMove();
    return this;
   },
