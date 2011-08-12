@@ -77,6 +77,13 @@ Allowed settings (all are optional unless specified otherwise):
 The scrubber bar is **disabled** by default, in order to give you time to add
 it to the page.
 
+If `width` is greater than `height`, then the bar will assume that it is
+horizontal, and changing the position will involve dragging any part of the
+bar horizontally.  If `width` is less than or equal to `height`, then the bar
+will assume that it is vertical, and changing the position will involve
+dragging any part of the bar vertically.  The orientation is accessible as the
+`DerpScrubber.orientation` property.
+
 DerpScrubber(width, height, barSize, barBG, highlightBG, outerBG, clickable)
 ----------------------------------------------------------------------------
 Returns a new DerpScrubber with the settings passed as arguments.  See
@@ -97,6 +104,17 @@ DerpScrubber.clickable
 ----------------------
 (Boolean) whether the scrubber bar will respond to being clicked on or dragged
 (defaults to `true`)
+
+DerpScrubber.orientation
+------------------------
+(String) `horizontal` if the scrubber bar is horizontal, or `vertical` if it
+is vertical.
+
+If `width` is greater than `height` in the constructor, then the bar will
+assume that it is horizontal, and changing the position will involve dragging
+any part of the bar horizontally.  If `width` is less than or equal to
+`height`, then the bar will assume that it is vertical, and changing the
+position will involve dragging any part of the bar vertically.
 
 DerpScrubber.appendTo(jQueryArgument) / DerpScrubber.prependTo(jQueryArgument)
 ------------------------------------------------------------------------------
