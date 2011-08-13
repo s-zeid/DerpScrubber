@@ -73,11 +73,20 @@
                  "Bitstream Vera Sans", "Verdana", sans-serif;
     font-size: 1em;
    }
-   h1 {
-    margin-bottom: 0;
-   }
    header, section {
     display: block;
+   }
+   #title {
+    display: inline;
+    margin: 0;
+    line-height: 1em;
+    font-size: 2em;
+   }
+   #tagline {
+    display: inline-block;
+    float: right;
+    margin: 0;
+    line-height: 2em;
    }
    #scrubber {
     margin: 1em 0;
@@ -113,8 +122,8 @@
  </head>
  <body>
   <header>
-   <h1>DerpScrubber Demo</h1>
-   <p><em>Herp Derp!</em></p>
+   <h1 id="title">DerpScrubber Demo</h1>
+   <p id="tagline"><em>Herp Derp!</em></p>
   </header>
   <section id="scrubbers">
    <p id="scrubber"></p>
