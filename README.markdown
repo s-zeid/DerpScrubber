@@ -138,23 +138,20 @@ DerpScrubber.getBarSize()
 -------------------------
 Returns the size of the entire scrubber bar.  Useful in conjunction with
 `DerpScrubber.getPosition()`.  However, try to use `DerpScrubber.getPercent()`
-or `DerpScrubber.getCoefficient()` instead, **as you will not receive `onMove`
-updates when the browser window is resized.**
+or `DerpScrubber.getCoefficient()` instead.
 
 DerpScrubber.getCoefficient()
 -----------------------------
-Returns the percentage of the bar area that is highlighted **divided by 100.***
+Returns the percentage of the bar area that is highlighted **divided by 100.**
 This is useful for mathematical operations, and this or
 `DerpScrubber.getPercent()` should be used in preference to
-`DerpScrubber.getPosition()`, **as you will not receive `onMove` updates when
-the browser window is resized.**
+`DerpScrubber.getPosition()`.
 
 DerpScrubber.getPercent()
 -------------------------
 Returns the percentage of the bar area that is highlighted.  This or
 `DerpScrubber.getCoefficient()` should be used in preference to
-`DerpScrubber.getPosition()`, **as you will not receive `onMove` updates when
-the browser window is resized.**
+`DerpScrubber.getPosition()`.
 
 DerpScrubber.getPosition()
 --------------------------
@@ -171,7 +168,7 @@ DerpScrubber.move([position=0, [event=null]])
 Sets the size of the highlighted area to the given position, or 0 if it is
 null, then calls all registered `onMove` callback functions.
 
-If the position is a string value of the format "<decimal number>%", then it
+If the position is a string value of the format `<decimal number>%`, then it
 will be interpreted as a percentage of the entire available bar space.
 
 If `position` is null and a JavaScript event object is passed as `event`, then
@@ -205,7 +202,7 @@ DerpScrubber.onMoveUnbind([callback])
 -------------------------------------
 Unregisters the callback function that `callback` is a reference to, or all
 callback functions if no such reference is passed.  You must pass the exact
-same reference that you previously passed to `onMove`/`onMoveBind`, and not
+same reference that you previously passed to `onMove` / `onMoveBind`, and not
 just a different function with identical code.
 
 DerpScrubber.removeFrom(jQueryArgument)
