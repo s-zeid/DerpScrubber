@@ -36,9 +36,9 @@ var DerpScrubber = (function() {
    this.width = width = obj.width;
    this.height = height = obj.height;
    this.barSize = barSize = obj.barSize;
-   this.outerBG = outerBG = obj.outerBG;
+   this.barBG = barBG = obj.barBG;
    this.highlightBG = highlightBG = obj.highlightBG;
-   this.outsideBG = outsideBG = obj.outsideBG;
+   this.outerBG = outerBG = obj.outerBG;
    this.clickable = clickable = obj.clickable;
    delete obj;
   } else {
