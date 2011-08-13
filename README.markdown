@@ -5,6 +5,8 @@ A simple JavaScript scrubber/slider widget.
 Copyright (c) 2011 Scott Zeid  
 https://github.com/scottywz/DerpScrubber
 
+Demo:  http://uploads.srwz.us/DerpScrubber/DerpScrubberDemo.html
+
 Example
 =======
     <script type="text/javascript" src="path/to/jquery.min.js"></script>
