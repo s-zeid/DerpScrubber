@@ -65,29 +65,6 @@
    });
   </script>
   <style type="text/css">
-   body {
-    margin: 1em;
-    background-color: #FFF;
-    color: #000;
-    font-family: "Ubuntu", "Trebuchet MS", "Droid Sans", "DejaVu Sans",
-                 "Bitstream Vera Sans", "Verdana", sans-serif;
-    font-size: 1em;
-   }
-   header, section {
-    display: block;
-   }
-   #title {
-    display: inline;
-    margin: 0;
-    line-height: 1em;
-    font-size: 2em;
-   }
-   #tagline {
-    display: inline-block;
-    float: right;
-    margin: 0;
-    line-height: 2em;
-   }
    #scrubber {
     margin: 1em 0;
     padding-right: 2px;
@@ -115,41 +92,109 @@
     background: #E6F1EE;
     border-radius: 5px;
    }
-   #info {
+   
+   body {
+    margin: 1em;
+    background-color: #FFF;
+    color: #000;
+    font-family: "Ubuntu", "Trebuchet MS", "Droid Sans", "DejaVu Sans",
+                 "Bitstream Vera Sans", "Verdana", sans-serif;
+    font-size: 1em;
+   }
+   a {
+    text-decoration: none;
+    color: #A00;
+   }
+   code {
+    color: #444;
+   }
+   li {
+    margin: 1em;
+   }
+   header, section {
+    display: block;
+   }
+   ul {
+    margin-left: 1em; 
+   }
+   #title {
+    display: inline;
+    margin: 0;
+    line-height: 1em;
+    font-size: 2em;
+   }
+   #tagline {
+    display: inline-block;
+    float: right;
+    margin: 0;
+    line-height: 2em;
+   }
+   #content {
     margin-left: 1em;
    }
   </style>
  </head>
  <body>
   <header>
-   <h1 id="title">DerpScrubber Demo</h1>
+   <h1 id="title">
+    <a href="https://github.com/scottywz/DerpScrubber">DerpScrubber</a> Demo
+   </h1>
    <p id="tagline"><em>Herp Derp!</em></p>
   </header>
   <section id="scrubbers">
    <p id="scrubber"></p>
    <div id="scrubber2"></div>
   </section>
-  <section id="info">
-   <p>
-    <div>
-     Scrubber 1 position:
-     <span id="position">JavaScript is disabled.</span>
-    </div>
-    <div>
-     Scrubber 1 percent:
-     <span id="percent">JavaScript is disabled.</span>
-    </div>
-   </p>
-   <p>
-    <div>
-     Scrubber 2 position:
-     <span id="position2">JavaScript is disabled.</span>
-    </div>
-    <div>
-     Scrubber 2 percent:
-     <span id="percent2">JavaScript is disabled.</span>
-    </div>
-   </p>
+  <section id="content">
+   <section id="status">
+    <p>
+     <div>
+      Scrubber 1 position:
+      <span id="position">JavaScript is disabled.</span>
+     </div>
+     <div>
+      Scrubber 1 percent:
+      <span id="percent">JavaScript is disabled.</span>
+     </div>
+    </p>
+    <p>
+     <div>
+      Scrubber 2 position:
+      <span id="position2">JavaScript is disabled.</span>
+     </div>
+     <div>
+      Scrubber 2 percent:
+      <span id="percent2">JavaScript is disabled.</span>
+     </div>
+    </p>
+   </section>
+   <section id="get-derpscrubber">
+    <h2>
+     <a href="https://github.com/scottywz/DerpScrubber">
+      Get DerpScrubber now!
+     </a>
+    </h2>
+    <p>
+     <ul>
+      <li>
+       <a href="https://github.com/scottywz/DerpScrubber">
+        https://github.com/scottywz/DerpScrubber
+       </a><br />
+       <code>git://github.com/scottywz/DerpScrubber.git</code>
+      </li>
+      <li>
+       <a href="https://github.com/scottywz/DerpScrubber/blob/master/README.markdown">
+        Readme file / Documentation
+       </a>
+      </li>
+      <li>
+       <a href="https://github.com/scottywz/DerpScrubber/blob/master/COPYING">
+        X11 License
+       </a>
+      </li>
+     </ul>
+    </p>
+   </section>
   </section>
  </body>
 </html>
