@@ -404,10 +404,10 @@ var DerpScrubber = (function() {
    if (typeof(percent) == "number")
     percent = String(Math.max(0, Math.min(percent, 100))) + "%";
    if (typeof(percent) != "string" || !percent.match(/^[0-9.]+\%?$/g))
-    if (percent == null || percent == "" ||Number(percent) == NaN)
+    if (percent == null || percent == "" || Number(percent) == NaN)
      percent = "100%";
    if (!percent.match(/^[0-9.]+\%$/g)) percent = percent + "%";
-   return this.move(String(percent) + "%");
+   return this.move(percent);
   },
   
   onMove: function(callback) {
