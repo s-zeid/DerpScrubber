@@ -85,7 +85,7 @@ Allowed settings (all are optional unless specified otherwise):
  * `outerBG` - CSS background value for the area outside of the scrubber bar
                (only applicable if `barSize` is less than `height`)
                (applied to the root element with the `DerpScrubber` class, not
-               to `DerpScrubber_outer`)
+               to `.DerpScrubber_outer`)
  
  * `handle` - CSS background value for the scrubber handle, or an already-made
               element to use as the handle, or null or any other value that
