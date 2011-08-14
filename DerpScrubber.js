@@ -31,8 +31,8 @@
 var DerpScrubber = (function() {
  var $ = jQuery;
  
- function DerpScrubber(width, height, barSize, barBG, highlightBG, outerBG,
-                       handle, clickable) {
+ function DerpScrubber(width, height, barSize, barBG, highlightBG, availableBG,
+                       outerBG, handle, clickable) {
   if (typeof(width) == "object") {
    var obj = width;
    this.width = width = obj.width;
@@ -40,6 +40,7 @@ var DerpScrubber = (function() {
    this.barSize = barSize = obj.barSize;
    this.barBG = barBG = obj.barBG;
    this.highlightBG = highlightBG = obj.highlightBG;
+   this.availableBG = availableBG = obj.availableBG;
    this.outerBG = outerBG = obj.outerBG;
    this.handle = handle = obj.handle;
    this.clickable = clickable = obj.clickable;
@@ -50,6 +51,7 @@ var DerpScrubber = (function() {
    this.barSize = barSize;
    this.barBG = barBG;
    this.highlightBG = highlightBG;
+   this.availableBG = availableBG;
    this.outerBG = outerBG;
    this.handle = handle;
    this.clickable = clickable;
@@ -89,10 +91,16 @@ var DerpScrubber = (function() {
   }
   
   this.highlight = $("<span></span>").addClass("DerpScrubber_highlight");
-  this.highlight.css("display", "inline-block").css("position", "static");
+  this.highlight.css("display", "block").css("position", "static");
   this.highlight.css("width", "100%").css("height", "100%");
   this.highlight.css("margin", "0")
   if (highlightBG) this.highlight.css("background", highlightBG);
+  
+  this.availableArea =$("<span></span>").addClass("DerpScrubber_availableArea");
+  this.availableArea.css("display", "block").css("position", "static");
+  this.availableArea.css("width", "100%").css("height", "100%");
+  this.availableArea.css("margin", "0")
+  if (availableBG) this.availableArea.css("background", availableBG);
   
   this.bar = $("<span></span>").addClass("DerpScrubber_bar");
   this.bar.css("display", "block").css("position", "absolute");
@@ -121,7 +129,8 @@ var DerpScrubber = (function() {
   this.root.addClass("DerpScrubber_" + this.orientation);
   this.root.addClass("DerpScrubber_" + ((handle) ? "hasHandle" : "noHandle"));
   
-  this.bar.append(this.highlight);
+  this.availableArea.append(this.highlight);
+  this.bar.append(this.availableArea);
   this.handleOuterContainer.append(this.handleContainer);
   this.outer.append(this.handleOuterContainer);
   this.outer.append(this.bar);
@@ -240,10 +249,22 @@ var DerpScrubber = (function() {
    return this;
   },
   
+  getAvailableSize: function() {
+   return this.getSizeOf(this.availableArea);
+  },
+  
+  getAvailableCoefficient: function() {
+   return this.getSizeOf(this.availableArea) / this.getSizeOf(this.bar);
+  },
+  
+  getAvailablePercent: function() {
+   return this.getAvailableCoefficient() * 100;
+  },
+  
   getCoefficient: function(position) {
    if (typeof(position) != "number" && !this.enabled) return null;
    if (typeof(position) != "number") position = this.getPosition();
-   return position / this.getBarSize();
+   return position / this.getAvailableSize();
   },
   
   getBarOffset: function() {
@@ -331,7 +352,7 @@ var DerpScrubber = (function() {
   move: function(position, event) {
    var cursor, percent, position;
    if (typeof(position) == "string" && position.match(/^[0-9.]+\%$/g))
-    position = (Number(position.replace("%", "")) / 100) * this.getBarSize();
+    position = (Number(position.replace("%","")) / 100)*this.getAvailableSize();
    if (typeof(position) != "number") {
     if (typeof(event) != "object")
      position = 0;
@@ -342,21 +363,35 @@ var DerpScrubber = (function() {
       position = this.getOffsetOf(this.outer) + this.getBarSize() - event.pageY;
     }
    }
-   position = Math.min(this.getBarSize(), Math.max(position, 0));
+   position = Math.min(this.getAvailableSize(), Math.max(position, 0));
    percent = this.getPercent(position);
    if (this.orientation == "horizontal") {
     this.highlight.css("width", String(percent) + "%");
-    if (this.handle) {
-     this.handleContainer.css("padding-left", String(percent) + "%");
-    }
    } else {
     this.highlight.css("height", String(percent) + "%");
     this.highlight.css("margin-top", (this.getBarSize() - position) + "px");
-    if (this.handle) {
-     this.handleContainer.css("padding-top", String(percent) + "%");
-    }
    }
+   this.moveHandle(percent);
    this.onMove();
+   return this;
+  },
+  
+  moveHandle: function(percent) {
+   if (!this.handle)
+    return this;
+   if (typeof(percent) != "number") {
+    if (typeof(percent) == "string" && percent.match(/^[0-9.]+\%$/g))
+     percent = percent.replace("%", "");
+    else
+     percent = this.getPercent();
+   }
+   if (this.orientation == "horizontal") {
+    percent *= this.getAvailableCoefficient();
+    this.handleContainer.css("padding-left", String(percent) + "%");
+   } else {
+    percent *= this.getAvailableCoefficient();
+    this.handleContainer.css("padding-top", String(percent) + "%");
+   }
    return this;
   },
   
@@ -405,6 +440,34 @@ var DerpScrubber = (function() {
   reset: function() {
    this.disable();
    this.move(0);
+   return this;
+  },
+  
+  setAvailableCoefficient: function(coeff) {
+   coeff = Math.max(0, Math.min(coeff, 1));
+   return this.setAvailableSize(String(coeff * 100) + "%");
+  },
+  
+  setAvailablePercent: function(percent) {
+   if (typeof(percent) == "number")
+    percent = String(Math.max(0, Math.min(percent, 100))) + "%";
+   if (typeof(percent) != "string" || !percent.match(/^[0-9.]+\%?$/g))
+    percent = "100%";
+   if (!percent.match(/^[0-9.]+\%$/g)) percent = percent + "%";
+   return this.setAvailableSize(percent);
+  },
+  
+  setAvailableSize: function(size) {
+   if (typeof(size) == "number")
+    size = String(Math.min(0, Math.max(size / this.getBarSize(), 1))) + "%";
+   else if (typeof(size) != "string" || !size.match(/^[0-9.]+\%$/g))
+    size = "100%";
+   var percent = this.getPercent();
+   if (this.orientation == "horizontal")
+    this.availableArea.css("width", size);
+   else
+    this.availableArea.css("height", size);
+   this.moveHandle(String(percent) + "%");
    return this;
   },
   

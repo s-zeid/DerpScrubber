@@ -87,6 +87,9 @@ Allowed settings (all are optional unless specified otherwise):
                (applied to the root element with the `DerpScrubber` class, not
                to `.DerpScrubber_outer`)
  
+ * `availableBG` - CSS background value for the available portion of the bar,
+                   if different from the bar background
+ 
  * `handle` - CSS background value for the scrubber handle, or an already-made
               element to use as the handle, or null or any other value that
               truth-tests to false if no handle is desired
@@ -104,8 +107,8 @@ will assume that it is vertical, and changing the position will involve
 dragging any part of the bar vertically.  The orientation is accessible as the
 `DerpScrubber.orientation` property.
 
-DerpScrubber(width, height, barSize, barBG, highlightBG, outerBG, handle, clickable)
-------------------------------------------------------------------------------------
+DerpScrubber(width, height, ...)
+--------------------------------
 Returns a new DerpScrubber with the settings passed as arguments.  See
 `DerpScrubber(settings)` for details about allowed settings.
 
@@ -158,6 +161,23 @@ Enables the scrubber bar, restoring the previous position if possible.
 The scrubber bar is **disabled** by default, in order to give you time to add
 it to the page.
 
+DerpScrubber.getAvailableCoefficient()
+--------------------------------------
+Returns the percentage of the bar size which is available to use, **divided by
+100.**  This is useful for mathematical operations.  Defaults to 1.
+
+DerpScrubber.getAvailablePercent()
+----------------------------------
+Returns the percentage of the bar size which is available to use.  Defaults to
+100.
+
+DerpScrubber.getAvailableSize()
+-------------------------------
+Returns the size of the available area.  Useful in conjunction with
+`DerpScrubber.getBarSize()`.  However, try to use
+`DerpScrubber.getAvailablePercent()` or `DerpScrubber.getAvailableCoefficient()`
+instead.
+
 DerpScrubber.getBarSize()
 -------------------------
 Returns the size of the entire scrubber bar.  Useful in conjunction with
@@ -189,7 +209,8 @@ Sets the size of the highlighted area to the given position, or 0 if it is
 null, then calls all registered `onMove` callback functions.
 
 If the position is a string value of the format `<decimal number>%`, then it
-will be interpreted as a percentage of the entire available bar space.
+will be interpreted as a percentage of the **available** bar space, not the
+entire bar space.
 
 If `position` is null and a JavaScript event object is passed as `event`, then
 the cursor position will be used to determine the size of the highlighted area.
@@ -234,6 +255,34 @@ DerpScrubber.reset()
 --------------------
 Resets the scrubber bar to its original, disabled state, with the position set
 to zero.  `onMove` callbacks will be called.
+
+DerpScrubber.setAvailableCoefficient(coeff)
+-------------------------------------------
+Sets the percentage of the bar which is available to use to the given value
+**times 100.**  The highlighted area will be adjusted to reflect this change.
+Useful for cases when only part of the bar should be useable, such as when only
+part of a video or song has been loaded.
+
+DerpScrubber.setAvailablePercent(percent)
+-----------------------------------------
+Sets the percentage of the bar which is available to use to the given value.
+The highlighted area will be adjusted to reflect this change.  Useful for cases
+when only part of the bar should be useable, such as when only part of a video
+or song has been loaded.
+
+DerpScrubber.setAvailableSize(size)
+-----------------------------------------
+Sets the size of the bar which is available to use to the given value.  The
+highlighted area will be adjusted to reflect this change.  Useful for cases
+when only part of the bar should be useable, such as when only part of a video
+or song has been loaded.  `DerpScrubber.setAvailableCoefficient()` and
+`DerpScrubber.setAvailablePercent()` are preferred to this method.
+
+Size can be of one of the following formats:
+
+ * `<decimal number>%` - percentage of the entire bar's size
+ * JavaScript number type - size in pixels; will be converted to a percentage
+ * anything else (including null) - 100%
 
 DerpScrubber.setClickable(bool)
 -------------------------------
