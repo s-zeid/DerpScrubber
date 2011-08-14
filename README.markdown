@@ -262,22 +262,28 @@ DerpScrubber.setAvailableCoefficient(coeff)
 -------------------------------------------
 Sets the percentage of the bar which is available to use to the given value
 **times 100.**  The highlighted area will be adjusted to reflect this change.
+`onMove` callbacks are **not** called.  Defaults to 1.
+
 Useful for cases when only part of the bar should be useable, such as when only
-part of a video or song has been loaded.  Defaults to 1.
+part of a video or song has been loaded.  
 
 DerpScrubber.setAvailablePercent(percent)
 -----------------------------------------
 Sets the percentage of the bar which is available to use to the given value.
-The highlighted area will be adjusted to reflect this change.  Useful for cases
-when only part of the bar should be useable, such as when only part of a video
-or song has been loaded.  Defaults to 100%.
+The highlighted area will be adjusted to reflect this change. `onMove`
+callbacks are **not** called.  Defaults to 1.
+
+Useful for cases when only part of the bar should be useable, such as when only
+part of a video or song has been loaded.
 
 DerpScrubber.setAvailableSize(size)
 -----------------------------------------
 Sets the size of the bar which is available to use to the given value.  The
-highlighted area will be adjusted to reflect this change.  Useful for cases
-when only part of the bar should be useable, such as when only part of a video
-or song has been loaded.  Defaults to 100%.
+highlighted area will be adjusted to reflect this change.  `onMove`
+callbacks are **not** called.  Defaults to 100%.
+
+Useful for cases when only part of the bar should be useable, such as when only
+part of a video or song has been loaded.
 
 `DerpScrubber.setAvailableCoefficient()` and
 `DerpScrubber.setAvailablePercent()` are preferred to this method.

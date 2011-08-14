@@ -137,7 +137,6 @@ var DerpScrubber = (function() {
   this.root.append(this.outer);
   
   this.allBorders = {x: 0, y: 0};
-  this.enabled = false;
   this.moveCallbacks = new Array();
   
   this.setClickable(clickable).setEnabled(false);
