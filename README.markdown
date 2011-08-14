@@ -16,7 +16,8 @@ Example
       var scrubber;
       scrubber = new DerpScrubber({
                   width: "100%", height: "24px",
-                  fillBackground: "#CCC", highlight: "#A00"
+                  fillBackground: "#CCC", highlight: "#A00",
+                  handle: "#EEE"
                  }).appendTo("#scrubber").enable();
       scrubber.onMove(function(info) {
        $("#percent").text(info.percent + "%");
