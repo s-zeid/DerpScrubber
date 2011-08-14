@@ -107,11 +107,11 @@ var DerpScrubber = (function() {
   this.outer.css("bottom", "0").css("left", "0");
   this.outer.css("width", "100%").css("height", "100%");
   this.outer.css("margin", "0").css("overflow", "hidden");
-  if (outerBG) this.outer.css("background", outerBG);
   
   this.root = $("<span></span>").addClass("DerpScrubber");
   this.root.css("display", "inline-block");
   this.root.css("width", width).css("height", height);
+  if (outerBG) this.root.css("background", outerBG);
   
   if (this.root.width() > this.root.height())
    this.orientation = "horizontal";
