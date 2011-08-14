@@ -118,15 +118,21 @@ var DerpScrubber = (function() {
   else
    this.orientation = "vertical";
   
-  this.highlight.css("display", "none");
+  this.root.addClass("DerpScrubber_" + this.orientation);
+  this.root.addClass("DerpScrubber_" + ((handle) ? "hasHandle" : "noHandle"));
+  
   this.bar.append(this.highlight);
   this.handleOuterContainer.append(this.handleContainer);
   this.outer.append(this.handleOuterContainer);
   this.outer.append(this.bar);
   this.root.append(this.outer);
   
-  this.allBorders = {x: 0, y: 0}
+  this.allBorders = {x: 0, y: 0};
+  this.enabled = false;
   this.moveCallbacks = new Array();
+  
+  this.setClickable(clickable).setEnabled(false);
+  this.root.bind("mousedown.DerpScrubber", this.makeDragHandler());
   
   return this;
  }
@@ -135,6 +141,8 @@ var DerpScrubber = (function() {
   adjustBox: function() {
    var outer = this.outer, bar = this.bar, root = this.root, center;
    var handle = this.handle, container = this.container, handleMargin;
+   this.highlight.css("display", "block");
+   this.handleOuterContainer.css("display", "block");
    if (this.orientation == "horizontal") {
     if (handle) {
      if (!this.userHandle) {
@@ -210,6 +218,10 @@ var DerpScrubber = (function() {
     bar.css("left", Math.max(barMarginX, 0) + "px");
     bar.css("right", Math.max(barMarginX, 0) + "px");
    }
+   if (this.enabled) {
+    this.handleOuterContainer.css("display",(this.clickable)? "block" : "none");
+    this.highlight.css("display", "none");
+   }
    return this;
   },
   
@@ -219,24 +231,17 @@ var DerpScrubber = (function() {
   },
   
   disable: function() {
-   if (typeof(this.dragHandler) == "function")
-    this.root.unbind("mousedown.DerpScrubber");
-   this.handleOuterContainer.css("display", "none");
-   this.highlight.css("display", "none");
+   this.setEnabled(false);
    return this;
   },
  
   enable: function() {
-   this.dragHandler = this.makeDragHandler();
-   this.handleOuterContainer.css("display", "block");
-   this.highlight.css("display", "block");
-   this.root.bind("mousedown.DerpScrubber", this.dragHandler);
-   this.onMove();
+   this.setEnabled(true);
    return this;
   },
   
   getCoefficient: function(position) {
-   if (typeof(position) != "number" && !this.isEnabled()) return null;
+   if (typeof(position) != "number" && !this.enabled) return null;
    if (typeof(position) != "number") position = this.getPosition();
    return position / this.getBarSize();
   },
@@ -290,35 +295,35 @@ var DerpScrubber = (function() {
   },
   
   getPercent: function(position) {
-   if (typeof(position) != "number" && !this.isEnabled()) return null;
+   if (typeof(position) != "number" && !this.enabled) return null;
    return this.getCoefficient(position) * 100;
   },
   
   getPosition: function() {
-   if (typeof(position) != "number" && !this.isEnabled()) return null;
+   if (typeof(position) != "number" && !this.enabled) return null;
    return this.getHighlightSize();
-  },
-  
-  isEnabled: function() {
-   if (typeof(this.highlight) != "object") return false;
-   return this.highlight.css("display") != "none";
   },
   
   makeDragHandler: function() {
    var scrubber = this;
    function doMove(e) {
-    if (e.which != 1) return; // Left mouse button only
-    scrubber.move(null, e);
+    // Left mouse button only
+    if (e.which != 1)
+     return;
+    if (scrubber.clickable && scrubber.enabled)
+     scrubber.move(null, e);
     e.preventDefault(); // Prevents text from being selected
    }
    function doUnbind(e) {
     $(window).unbind("mousemove", doMove).unbind("mouseup", doUnbind);
    }
    function handler(e) {
-    if (scrubber.clickable) {
-     doMove(e); // Allow clicking anywhere on the outer to move
-     $(window).mousemove(doMove).mouseup(doUnbind);
-    }
+    if (scrubber.clickable && scrubber.enabled)
+     doMove(e); // Allow clicking anywhere on outer to move
+    // Always do this to prevent text selection even when the scrubber is not
+    // clickable or disabled
+    $(window).mousemove(doMove).mouseup(doUnbind);
+    e.preventDefault(); // Prevents text from being selected
    }
    return handler;
   },
@@ -404,8 +409,33 @@ var DerpScrubber = (function() {
   },
   
   setClickable: function(clickable) {
-   this.clickable = clickable;
-   this.handleOuterContainer.css("display", (clickable) ? "block" : "none");
+   this.clickable = Boolean(clickable);
+   if (clickable) {
+    this.handleOuterContainer.css("display", (this.enabled) ? "block" : "none");
+    this.root.removeClass("DerpScrubber_notClickable");
+    this.root.addClass("DerpScrubber_clickable");
+   } else {
+    this.handleOuterContainer.css("display", "none");
+    this.root.removeClass("DerpScrubber_clickable");
+    this.root.addClass("DerpScrubber_notClickable");
+   }
+   return this;
+  },
+  
+  setEnabled: function(enabled) {
+   this.enabled = Boolean(enabled);
+   if (enabled) {
+    if (this.clickable) this.handleOuterContainer.css("display", "block");
+    this.highlight.css("display", "block");
+    this.onMove();
+    this.root.removeClass("DerpScrubber_disabled");
+    this.root.addClass("DerpScrubber_enabled");
+   } else {
+    this.highlight.css("display", "none");
+    this.handleOuterContainer.css("display", "none");
+    this.root.removeClass("DerpScrubber_enabled");
+    this.root.addClass("DerpScrubber_disabled");
+   }
    return this;
   },
  };

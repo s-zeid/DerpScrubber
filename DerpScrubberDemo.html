@@ -158,7 +158,7 @@
    }
    
    function toggle_enabled() {
-    if (scrubber.isEnabled()) {
+    if (scrubber.enabled) {
      scrubber.disable(); $("#toggle_enabled").text("Enable scrubber 1");
     } else {
      scrubber.enable(); $("#toggle_enabled").text("Disable scrubber 1");
@@ -166,7 +166,7 @@
    }
    
    function toggle_enabled_2() {
-    if (scrubber2.isEnabled()) {
+    if (scrubber2.enabled) {
      scrubber2.disable(); $("#toggle_enabled_2").text("Enable scrubber 2");
     } else {
      scrubber2.enable(); $("#toggle_enabled_2").text("Disable scrubber 2");

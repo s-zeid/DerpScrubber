@@ -45,9 +45,16 @@ The following CSS classes are available for you to use for theming purposes:
        * `DerpScrubber_bar` - the main scrubber bar
           * `DerpScrubber_highlight` - the highlighted area
 
-These elements are nested as shown above.
+These elements are nested as shown above.  **Do not change the `position` or
+`display` properties of these elements.**
 
-**Do not change the `position` or `display` properties of these elements.**
+The following classes are available depending on the state of the scrubber bar:
+ * `DerpScrubber_enabled`
+ * `DerpScrubber_disabled`
+ * `DerpScrubber_clickable`
+ * `DerpScrubber_notClickable`
+ * `DerpScrubber_horizontal`
+ * `DerpScrubber_vertical`
 
 DerpScrubber API
 ================
@@ -112,8 +119,12 @@ Properties:
 
 DerpScrubber.clickable
 ----------------------
-(Boolean) whether the scrubber bar will respond to being clicked on or dragged
-(defaults to `true`)
+(Boolean) Whether or not the scrubber bar will respond to being clicked on or
+dragged.  (Defaults to `true`.)
+
+DerpScrubber.enabled
+------------------------
+(Boolean) Whether or not the scrubber bar is enabled.  (Defaults to `false`.)
 
 DerpScrubber.orientation
 ------------------------
@@ -168,10 +179,6 @@ DerpScrubber.getPosition()
 Returns the current size in pixels of the highlighted area.  Try to use
 `DerpScrubber.getPercent()` or `DerpScrubber.getCoefficient()` instead, **as
 you will not receive `onMove` updates when the browser window is resized.**
-
-DerpScrubber.isEnabled()
-------------------------
-Returns `true` if the scrubber bar is enabled or `false` otherwise.
 
 DerpScrubber.move([position=0, [event=null]])
 ---------------------------------------------
@@ -229,5 +236,11 @@ DerpScrubber.setClickable(bool)
 -------------------------------
 Sets the `clickable` property, which decides whether the scrubber bar will
 respond to being clicked on or dragged and whether the handle will be shown.
-The default value is `true`.  **Always use this method instead of setting the
-clickable property directly.**
+The default value is `true`.  **Always use this method.  NEVER set the
+`clickable` property directly.**
+
+DerpScrubber.setEnabled(bool)
+-----------------------------
+Enables or disables the scrubber bar based on the boolean value given.  The
+default value is `false.`  **Always use this method or `DerpScrubber.enable()`
+and `DerpScrubber.disable().  NEVER set the `enabled` property directly.**
