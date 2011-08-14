@@ -33,26 +33,19 @@
    other dealings in this Software without prior written authorization.
   -->
   <title>DerpScrubber Demo Herp Derp</title>
+  <link rel="stylesheet" type="text/css"
+        href="https://fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold,bolditalic" />
   <script type="text/javascript"
           src="http://code.jquery.com/jquery-latest.js"></script>
   <script type="text/javascript" src="DerpScrubber.js"></script>
   <script type="text/javascript">
-   function update_text(info) {
-    var pos = info.position, percent = info.percent;
-    $("#position").text((pos == null) ? "disabled" : String(pos) + "px");
-    $("#percent").text((percent == null) ? "disabled" : String(percent) + "%");
-   }
-   
-   function update_text_2(info) {
-    var pos = info.position, percent = info.percent;
-    $("#position2").text((pos == null) ? "disabled" : String(pos) + "px");
-    $("#percent2").text((percent == null) ? "disabled" : String(percent) + "%");
-   }
+   var scrubber, scrubber2;
    
    $(function() {
     scrubber = new DerpScrubber({
      width: "100%", height: "24px", barSize: "8px",
-     barBG: "#999", highlightBG: "#A00", outerBG: "#F2F1F0"
+     barBG: "#999", highlightBG: "#A00", outerBG: "#F2F1F0",
+     handle: $("<span>&nbsp;Drag me!&nbsp;</span>")
     }).onMove(update_text).onMove(function(info) {
      scrubber2.move(String(info.percent) + "%");
     }).appendTo("#scrubber");
@@ -62,15 +55,27 @@
     
     scrubber.enable();
     scrubber2.enable();
+    
+    $("#toggle_clickable").click(toggle_clickable);
+    $("#toggle_clickable_2").click(toggle_clickable_2);
+    $("#toggle_enabled").click(toggle_enabled);
+    $("#toggle_enabled_2").click(toggle_enabled_2);
    });
   </script>
   <style type="text/css">
    #scrubber {
     margin: 1em 0;
-    padding-right: 2px;
    }
    #scrubber .DerpScrubber_bar {
     border: 1px solid #444;
+   }
+   #scrubber .DerpScrubber_handle {
+    height: 18px;
+    border: 1px solid #D0CDCA;
+    border-radius: 15px;
+    background: #E2E0DD;
+    font-size: .9em;
+    cursor: default;
    }
    #scrubber2 {
     float: left;
@@ -101,9 +106,10 @@
                  "Bitstream Vera Sans", "Verdana", sans-serif;
     font-size: 1em;
    }
-   a {
+   a, .toggles span {
     text-decoration: none;
     color: #A00;
+    cursor: pointer;
    }
    code {
     color: #444;
@@ -133,6 +139,51 @@
     margin-left: 1em;
    }
   </style>
+  <script type="text/javascript">
+   function toggle_clickable() {
+    if (scrubber.clickable) { scrubber.setClickable(false);
+     $("#toggle_clickable").text("Make scrubber 1 clickable");
+    } else { scrubber.setClickable(true);
+     $("#toggle_clickable").text("Make scrubber 1 unclickable");
+    }
+   }
+   
+   function toggle_clickable_2() {
+    if (scrubber2.clickable) { scrubber2.setClickable(false);
+     $("#toggle_clickable_2").text("Make scrubber 2 clickable");
+    } else { scrubber2.setClickable(true);
+     $("#toggle_clickable_2").text("Make scrubber 2 unclickable");
+    }
+   }
+   
+   function toggle_enabled() {
+    if (scrubber.isEnabled()) {
+     scrubber.disable(); $("#toggle_enabled").text("Enable scrubber 1");
+    } else {
+     scrubber.enable(); $("#toggle_enabled").text("Disable scrubber 1");
+    }
+   }
+   
+   function toggle_enabled_2() {
+    if (scrubber2.isEnabled()) {
+     scrubber2.disable(); $("#toggle_enabled_2").text("Enable scrubber 2");
+    } else {
+     scrubber2.enable(); $("#toggle_enabled_2").text("Disable scrubber 2");
+    }
+   }
+   
+   function update_text(info) {
+    var pos = info.position, percent = info.percent;
+    $("#percent").text((percent == null) ? "disabled" : String(percent) + "%");
+    $("#position").text((pos == null) ? "disabled" : String(pos) + "px");
+   }
+   
+   function update_text_2(info) {
+    var pos = info.position, percent = info.percent;
+    $("#percent2").text((percent == null) ? "disabled" : String(percent) + "%");
+    $("#position2").text((pos == null) ? "disabled" : String(pos) + "px");
+   }
+  </script>
  </head>
  <body>
   <header>
@@ -149,22 +200,30 @@
    <section id="status">
     <p>
      <div>
+      Scrubber 1 percent:
+      <span id="percent">JavaScript is disabled.</span>
+     </div>
+     <div>
       Scrubber 1 position:
       <span id="position">JavaScript is disabled.</span>
      </div>
-     <div>
-      Scrubber 1 percent:
-      <span id="percent">JavaScript is disabled.</span>
+     <div class="toggles">
+      <span id="toggle_enabled">Disable scrubber 1</span> |
+      <span id="toggle_clickable">Make scrubber 1 unclickable</span>
      </div>
     </p>
     <p>
      <div>
+      Scrubber 2 percent:
+      <span id="percent2">JavaScript is disabled.</span>
+     </div>
+     <div>
       Scrubber 2 position:
       <span id="position2">JavaScript is disabled.</span>
      </div>
-     <div>
-      Scrubber 2 percent:
-      <span id="percent2">JavaScript is disabled.</span>
+     <div class="toggles">
+      <span id="toggle_enabled_2">Disable scrubber 2</span> |
+      <span id="toggle_clickable_2">Make scrubber 2 clickable</span>
      </div>
     </p>
    </section>

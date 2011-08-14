@@ -29,8 +29,10 @@
  */
 
 var DerpScrubber = (function() {
+ var $ = jQuery;
+ 
  function DerpScrubber(width, height, barSize, barBG, highlightBG, outerBG,
-                       clickable) {
+                       handle, clickable) {
   if (typeof(width) == "object") {
    var obj = width;
    this.width = width = obj.width;
@@ -39,6 +41,7 @@ var DerpScrubber = (function() {
    this.barBG = barBG = obj.barBG;
    this.highlightBG = highlightBG = obj.highlightBG;
    this.outerBG = outerBG = obj.outerBG;
+   this.handle = handle = obj.handle;
    this.clickable = clickable = obj.clickable;
    delete obj;
   } else {
@@ -48,11 +51,42 @@ var DerpScrubber = (function() {
    this.barBG = barBG;
    this.highlightBG = highlightBG;
    this.outerBG = outerBG;
+   this.handle = handle;
    this.clickable = clickable;
   }
   
   if (typeof(this.clickable) == "undefined")
    this.clickable = clickable = true;
+  
+  this.handleContainer = $("<span></span>").css("position", "static");
+  this.handleContainer.addClass("DerpScrubber_handleContainer");
+  this.handleContainer.css("width", "100%").css("height", "100%");
+  this.handleContainer.css("display", "block").css("margin", "0");
+  
+  this.handleOuterContainer = $("<span></span>");
+  this.handleOuterContainer.addClass("DerpScrubber_handleOuterContainer");
+  this.handleOuterContainer.css("position", "absolute");
+  this.handleOuterContainer.css("top", "0").css("right", "0");
+  this.handleOuterContainer.css("bottom", "0").css("left", "0");
+  this.handleOuterContainer.css("width", "auto").css("height", "auto");
+  this.handleOuterContainer.css("display", "block").css("margin", "0");
+  this.handleOuterContainer.css("float", "left").css("z-index", "2");
+  
+  this.userHandle = typeof(handle) == "object";
+  if (!this.userHandle) {
+   if (handle && typeof(handle) == "string") {
+    this.handle = $("<span></span>").addClass("DerpScrubber_handle");
+    this.handle.css("background", handle);
+    handle = this.handle;
+   } else
+    this.handle = handle = null;
+  }
+  if (this.handle) {
+   this.handle.addClass("DerpScrubber_handle");
+   this.handle.css("display", "inline-block").css("position", "static");
+   this.handle.css("margin", "0").css("overflow", "hidden");
+   this.handleContainer.append(this.handle);
+  }
   
   this.highlight = $("<span></span>").addClass("DerpScrubber_highlight");
   this.highlight.css("display", "inline-block").css("position", "static");
@@ -61,12 +95,16 @@ var DerpScrubber = (function() {
   if (highlightBG) this.highlight.css("background", highlightBG);
   
   this.bar = $("<span></span>").addClass("DerpScrubber_bar");
-  this.bar.css("display", "block").css("position", "static");
-  this.bar.css("margin", "0");
+  this.bar.css("display", "block").css("position", "absolute");
+  this.bar.css("top", "0").css("right", "0");
+  this.bar.css("bottom", "0").css("left", "0");
+  this.bar.css("width", "auto").css("height", "auto").css("margin", "0");
   if (barBG) this.bar.css("background", barBG);
   
   this.outer = $("<span></span>").addClass("DerpScrubber_outer");
-  this.outer.css("display", "inline-block").css("position", "static");
+  this.outer.css("display", "block").css("position", "relative");
+  this.outer.css("top", "0").css("right", "0");
+  this.outer.css("bottom", "0").css("left", "0");
   this.outer.css("width", "100%").css("height", "100%");
   this.outer.css("margin", "0").css("overflow", "hidden");
   if (outerBG) this.outer.css("background", outerBG);
@@ -75,14 +113,15 @@ var DerpScrubber = (function() {
   this.root.css("display", "inline-block");
   this.root.css("width", width).css("height", height);
   
-  if (this.root.width() > this.root.height()) {
+  if (this.root.width() > this.root.height())
    this.orientation = "horizontal";
-  } else {
+  else
    this.orientation = "vertical";
-  }
   
   this.highlight.css("display", "none");
   this.bar.append(this.highlight);
+  this.handleOuterContainer.append(this.handleContainer);
+  this.outer.append(this.handleOuterContainer);
   this.outer.append(this.bar);
   this.root.append(this.outer);
   
@@ -94,18 +133,54 @@ var DerpScrubber = (function() {
  
  DerpScrubber.prototype = {
   adjustBox: function() {
-   var outer = this.outer, bar = this.bar, root = this.root;
-   if (!this.bar.width()) this.bar.css("width", "100%");
-   if (!this.bar.height()) this.bar.css("height", "100%");
-   if (this.root.width() > this.root.height()) {
+   var outer = this.outer, bar = this.bar, root = this.root, center;
+   var handle = this.handle, container = this.container, handleMargin;
+   if (this.orientation == "horizontal") {
+    if (handle) {
+     if (!this.userHandle) {
+      handle.css("width", this.handleContainer.height() / 2);
+      if (!handle.height()) this.handle.css("height", this.height);
+      handleBorderX = Math.abs(handle.outerWidth() - handle.width());
+      handleBorderY = Math.abs(handle.outerHeight() - handle.height());
+      handle.css("width", handle.width() - handleBorderX);
+      handle.css("height", handle.height() - handleBorderY);
+     }
+     center = this.getHandleSize() / 2;
+     handleMargin = (this.outer.height() - this.handle.outerHeight()) / 2;
+     handle.css("margin-top", String(Math.floor(handleMargin) + "px"));
+     handle.css("margin-left", String(-center) + "px");
+     bar.css("left", String(center) + "px");
+     bar.css("right", String(center) + "px");
+     this.handleOuterContainer.css("left", String(center) + "px");
+     this.handleOuterContainer.css("right", String(center) + "px");
+    }
     this.highlight.css("width", "0%");
     if (typeof(this.barSize) == "string")
      bar.css("height", this.barSize);
    } else {
+    if (handle) {
+     if (!this.userHandle) {
+      if (!handle.width()) this.handle.css("width", this.width);
+      handle.css("height", this.handleContainer.width() / 2);
+      handleBorderX = Math.abs(handle.outerWidth() - handle.width());
+      handleBorderY = Math.abs(handle.outerHeight() - handle.height());
+      handle.css("width", handle.width() - handleBorderX);
+      handle.css("height", handle.height() - handleBorderY);
+     }
+     center = this.getHandleSize() / 2;
+     handleMargin = (this.outer.height() - this.handle.outerHeight()) / 2;
+     handle.css("margin-left", String(Math.floor(handleMargin) + "px"));
+     handle.css("margin-top", String(-center) + "px");
+     bar.css("top", String(center) + "px");
+     bar.css("bottom", String(center) + "px");
+     handleOuterContainer.css("top", String(center) + "px");
+     handleOuterContainer.css("bottom", String(center) + "px");
+    }
     this.highlight.css("height", "0%");
     if (typeof(this.barSize) == "string")
      bar.css("width", this.barSize);
    }
+   center = this.getHandleSize() / 2;
    var barBorderX = Math.abs(bar.outerWidth() - bar.width()) / 2;
    var barBorderY = Math.abs(bar.outerHeight() - bar.height()) / 2;
    var outerBorderX = Math.abs(root.width() - outer.outerWidth()) / 2;
@@ -121,24 +196,19 @@ var DerpScrubber = (function() {
     if (bar.height() >= outer.height())
      bar.css("height", String(bar.height() - barBorderY * 2) + "px");
     var barMarginY = (outer.height() - bar.outerHeight()) / 2;
-    bar.css("margin-top", Math.max(barMarginY, 0) + "px");
-    bar.css("margin-bottom", Math.max(barMarginY, 0) + "px");
-    if (outerBorderX) {
-     outer.css("padding-right", String(barBorderX * 2) + "px");
-     root.css("padding-right", String(barBorderX * 2 + outerBorderX * 2) + "px");
-    }
+    bar.css("top", Math.max(barMarginY, 0) + "px");
+    bar.css("bottom", Math.max(barMarginY, 0) + "px");
+    bar.css("left", String(center - barBorderX) + "px");
+    bar.css("right", String(center - barBorderX) + "px");
    } else {
     outer.css("width", String(outer.width() - outerBorderX * 2) + "px");
     if (bar.width() >= outer.width())
      bar.css("width", String(bar.width() - barBorderX * 2) + "px");
     var barMarginX = (outer.width() - bar.outerWidth()) / 2;
-    bar.css("margin-left", Math.max(barMarginX, 0) + "px");
-    bar.css("margin-right", Math.max(barMarginX, 0) + "px");
-    //if (!barBorderX) bar.css("padding-bottom", String(outerBorderY) + "px");
-    if (outerBorderY) {
-     outer.css("padding-bottom", String(barBorderY * 2) + "px");
-     root.css("padding-bottom", String(barBorderY * 2 + outerBorderY *2) + "px");
-    }
+    bar.css("top", String(center - barBorderX) + "px");
+    bar.css("bottom", String(center - barBorderX) + "px");
+    bar.css("left", Math.max(barMarginX, 0) + "px");
+    bar.css("right", Math.max(barMarginX, 0) + "px");
    }
    return this;
   },
@@ -150,15 +220,17 @@ var DerpScrubber = (function() {
   
   disable: function() {
    if (typeof(this.dragHandler) == "function")
-    this.root.unbind(this.dragHandler);
+    this.root.unbind("mousedown.DerpScrubber");
+   this.handleOuterContainer.css("display", "none");
    this.highlight.css("display", "none");
    return this;
   },
  
   enable: function() {
    this.dragHandler = this.makeDragHandler();
+   this.handleOuterContainer.css("display", "block");
    this.highlight.css("display", "block");
-   this.root.mousedown(this.dragHandler);
+   this.root.bind("mousedown.DerpScrubber", this.dragHandler);
    this.onMove();
    return this;
   },
@@ -175,6 +247,11 @@ var DerpScrubber = (function() {
   
   getBarSize: function() {
    return this.getSizeOf(this.bar);
+  },
+  
+  getHandleSize: function() {
+   if (typeof(this.handle) == "undefined") return 0;
+   return this.getOuterSizeOf(this.handle);
   },
   
   getHighlightOffset: function() {
@@ -198,6 +275,12 @@ var DerpScrubber = (function() {
     offset += (element.outerHeight(true) - element.height()) / 2;
    }
    return offset;
+  },
+  
+  getOuterSizeOf: function(element) {
+   if (this.orientation == "horizontal")
+    return $(element).outerWidth();
+   return $(element).outerHeight();
   },
   
   getSizeOf: function(element) {
@@ -241,7 +324,7 @@ var DerpScrubber = (function() {
   },
   
   move: function(position, event) {
-   var cursor, position;
+   var cursor, percent, position;
    if (typeof(position) == "string" && position.match(/^[0-9.]+\%$/g))
     position = (Number(position.replace("%", "")) / 100) * this.getBarSize();
    if (typeof(position) != "number") {
@@ -252,14 +335,21 @@ var DerpScrubber = (function() {
       position = event.pageX - this.getBarOffset();
      else
       position = this.getOffsetOf(this.outer) + this.getBarSize() - event.pageY;
-     position = Math.min(this.getBarSize(), Math.max(position, 0));
     }
    }
-   if (this.orientation == "horizontal")
-    this.highlight.css("width", String(this.getPercent(position)) + "%");
-   else {
-    this.highlight.css("height", String(this.getPercent(position)) + "%");
+   position = Math.min(this.getBarSize(), Math.max(position, 0));
+   percent = this.getPercent(position);
+   if (this.orientation == "horizontal") {
+    this.highlight.css("width", String(percent) + "%");
+    if (this.handle) {
+     this.handleContainer.css("padding-left", String(percent) + "%");
+    }
+   } else {
+    this.highlight.css("height", String(percent) + "%");
     this.highlight.css("margin-top", (this.getBarSize() - position) + "px");
+    if (this.handle) {
+     this.handleContainer.css("padding-top", String(percent) + "%");
+    }
    }
    this.onMove();
    return this;
@@ -315,6 +405,7 @@ var DerpScrubber = (function() {
   
   setClickable: function(clickable) {
    this.clickable = clickable;
+   this.handleOuterContainer.css("display", (clickable) ? "block" : "none");
    return this;
   },
  };

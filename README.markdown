@@ -38,12 +38,13 @@ The following CSS classes are available for you to use for theming purposes:
 
  * `DerpScrubber` - the root element of the scrubber bar
     * `DerpScrubber_outer` - the element containing the outer background
+       * `DerpScrubber_handleOuterContainer` - the outer container of the handle
+          * `DerpScrubber_handleContainer` - the inner container of the handle
+             * `DerpScrubber_handle` - the handle of the scrubber bar
        * `DerpScrubber_bar` - the main scrubber bar
           * `DerpScrubber_highlight` - the highlighted area
 
-All of these match spans that must be set to `display: inline-block`, except
-`DerpScrubber_bar` should be `display: block`.  The elements are nested as
-shown above.
+**Do not change the `position` or `display` properties of these elements.**
 
 DerpScrubber API
 ================
@@ -73,6 +74,10 @@ Allowed settings (all are optional unless specified otherwise):
  * `outerBG` - CSS background value for the area outside of the scrubber bar
                (only applicable if `barSize` is less than `height`)
  
+ * `handle` - CSS background value for the scrubber handle, or an already-made
+              element to use as the handle, or null or any other value that
+              truth-tests to false if no handle is desired
+ 
  * `clickable` - Boolean value specifying whether the scrubber bar will respond
                  to being clicked on or dragged (defaults to `true`)
 
@@ -86,8 +91,8 @@ will assume that it is vertical, and changing the position will involve
 dragging any part of the bar vertically.  The orientation is accessible as the
 `DerpScrubber.orientation` property.
 
-DerpScrubber(width, height, barSize, barBG, highlightBG, outerBG, clickable)
-----------------------------------------------------------------------------
+DerpScrubber(width, height, barSize, barBG, highlightBG, outerBG, handle, clickable)
+------------------------------------------------------------------------------------
 Returns a new DerpScrubber with the settings passed as arguments.  See
 `DerpScrubber(settings)` for details about allowed settings.
 
@@ -126,8 +131,8 @@ scrubber bar added to only one element at a given time.
 
 DerpScrubber.disable()
 ----------------------
-Disables the scrubber bar, hiding the highlighted area but preserving the
-position.
+Disables the scrubber bar, hiding the highlighted area and handle but preserving
+the position.
 
 DerpScrubber.enable()
 ---------------------
@@ -220,4 +225,6 @@ to zero.  `onMove` callbacks will be called.
 DerpScrubber.setClickable(bool)
 -------------------------------
 Sets the `clickable` property, which decides whether the scrubber bar will
-respond to being clicked on or dragged.  The default value is `true`.
+respond to being clicked on or dragged and whether the handle will be shown.
+The default value is `true`.  **Always use this method instead of setting the
+clickable property directly.**
