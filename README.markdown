@@ -45,6 +45,8 @@ The following CSS classes are available for you to use for theming purposes:
        * `DerpScrubber_bar` - the main scrubber bar
           * `DerpScrubber_highlight` - the highlighted area
 
+These elements are nested as shown above.
+
 **Do not change the `position` or `display` properties of these elements.**
 
 DerpScrubber API
