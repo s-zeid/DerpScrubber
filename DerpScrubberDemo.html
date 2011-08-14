@@ -44,11 +44,11 @@
    $(function() {
     scrubber = new DerpScrubber({
      width: "100%", height: "24px", barSize: "8px", outerBG: "#F2F1F0",
-     barBG: "#555", highlightBG: "#A00", availableBG: "#999",
+     barBG: "#777", highlightBG: "#A00", availableBG: "#999",
      handle:$("<span></span>").html("&nbsp;Drag me!&nbsp;")
     }).onMove(update_text).onMove(function(info) {
      scrubber2.move(String(info.percent) + "%");
-    }).appendTo("#scrubber");
+    }).setAvailablePercent(80).appendTo("#scrubber");
     
     scrubber2 = new DerpScrubber("16px", "300px").setClickable(false);
     scrubber2.onMove(update_text_2).appendTo("#scrubber2");
