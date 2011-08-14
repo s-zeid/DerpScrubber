@@ -39,12 +39,15 @@ The following CSS classes are available for you to use for theming purposes:
 
  * `DerpScrubber` - the root element of the scrubber bar
     * `DerpScrubber_outer` - the element containing the main bar and handle
-                             containers
+      containers
        * `DerpScrubber_handleOuterContainer` - the outer container of the handle
           * `DerpScrubber_handleContainer` - the inner container of the handle
              * `DerpScrubber_handle` - the handle of the scrubber bar
        * `DerpScrubber_bar` - the main scrubber bar
-          * `DerpScrubber_highlight` - the highlighted area
+          * `DerpScrubber_availableArea` - the portion of the bar which is
+            available to use
+             * `DerpScrubber_highlight` - the highlighted portion of the
+               available area
 
 These elements are nested as shown above.  **Do not change the `position` or
 `display` properties of these elements.**
@@ -75,27 +78,26 @@ Allowed settings (all are optional unless specified otherwise):
  * `height` - CSS height value for the entire widget (required)
  
  * `barSize` - CSS width or height value for the scrubber bar if you want it to
-               be smaller than the entire widget
+   be smaller than the entire widget
  
  * `barBG` - CSS background value for the scrubber bar
  
  * `highlightBG` - CSS background value for the highlighted portion of the bar
-                   (required if you want your users to see the value)
+   (required if you want your users to see the value)
  
  * `outerBG` - CSS background value for the area outside of the scrubber bar
-               (only applicable if `barSize` is less than `height`)
-               (applied to the root element with the `DerpScrubber` class, not
-               to `.DerpScrubber_outer`)
+   (only applicable if `barSize` is less than `height`) (applied to the root
+   element with the `DerpScrubber` class, not to `.DerpScrubber_outer`)
  
  * `availableBG` - CSS background value for the available portion of the bar,
-                   if different from the bar background
+   if you want it to be different from the bar background
  
  * `handle` - CSS background value for the scrubber handle, or an already-made
-              element to use as the handle, or null or any other value that
-              truth-tests to false if no handle is desired
+   element to use as the handle, or null or any other value that truth-tests to
+   false if no handle is desired
  
  * `clickable` - Boolean value specifying whether the scrubber bar will respond
-                 to being clicked on or dragged (defaults to `true`)
+   to being clicked on or dragged (defaults to `true`)
 
 The scrubber bar is **disabled** by default, in order to give you time to add
 it to the page.
