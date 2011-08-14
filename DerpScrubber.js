@@ -352,6 +352,8 @@ var DerpScrubber = (function() {
    var cursor, percent, position;
    if (typeof(position) == "string" && position.match(/^[0-9.]+\%$/g))
     position = (Number(position.replace("%","")) / 100)*this.getAvailableSize();
+   if (typeof(position) == "string" && position != "" && Number(position) !=NaN)
+    position = Number(position);
    if (typeof(position) != "number") {
     if (typeof(event) != "object")
      position = 0;
@@ -392,6 +394,20 @@ var DerpScrubber = (function() {
     this.handleContainer.css("padding-top", String(percent) + "%");
    }
    return this;
+  },
+  
+  moveToCoefficient: function(coeff) {
+   return this.moveToPercent(Number(coeff) * 100);
+  },
+  
+  moveToPercent: function(percent) {
+   if (typeof(percent) == "number")
+    percent = String(Math.max(0, Math.min(percent, 100))) + "%";
+   if (typeof(percent) != "string" || !percent.match(/^[0-9.]+\%?$/g))
+    if (percent == null || percent == "" ||Number(percent) == NaN)
+     percent = "100%";
+   if (!percent.match(/^[0-9.]+\%$/g)) percent = percent + "%";
+   return this.move(String(percent) + "%");
   },
   
   onMove: function(callback) {
@@ -444,14 +460,15 @@ var DerpScrubber = (function() {
   
   setAvailableCoefficient: function(coeff) {
    coeff = Math.max(0, Math.min(coeff, 1));
-   return this.setAvailableSize(String(coeff * 100) + "%");
+   return this.setAvailableSize(String(Number(coeff) * 100) + "%");
   },
   
   setAvailablePercent: function(percent) {
    if (typeof(percent) == "number")
     percent = String(Math.max(0, Math.min(percent, 100))) + "%";
    if (typeof(percent) != "string" || !percent.match(/^[0-9.]+\%?$/g))
-    percent = "100%";
+    if (percent == null || percent == "" || Number(percent) == NaN)
+     percent = "100%";
    if (!percent.match(/^[0-9.]+\%$/g)) percent = percent + "%";
    return this.setAvailableSize(percent);
   },
@@ -460,7 +477,8 @@ var DerpScrubber = (function() {
    if (typeof(size) == "number")
     size = String(Math.min(0, Math.max(size / this.getBarSize(), 1))) + "%";
    else if (typeof(size) != "string" || !size.match(/^[0-9.]+\%$/g))
-    size = "100%";
+    if (percent == null || percent == "" || Number(size) == NaN)
+     size = "100%";
    var percent = this.getPercent();
    if (this.orientation == "horizontal")
     this.availableArea.css("width", size);

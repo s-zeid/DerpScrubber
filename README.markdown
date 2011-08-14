@@ -219,6 +219,17 @@ the cursor position will be used to determine the size of the highlighted area.
 This is mainly intended for internal use, and is only documented here for
 completeness.
 
+DerpScrubber.moveToCoefficient(coeff)
+-------------------------------------
+Sets the size of the highlighted area to the given number, **times 100,** as a
+percentage of the available bar space.
+
+DerpScrubber.moveToPercent(percent)
+-----------------------------------
+Sets the size of the highlighted area to the given percentage of the available
+bar space.  You may include a percent sign at the end of the number if it is a
+string.
+
 DerpScrubber.onMove([callback])
 -------------------------------
 Registers a callback function to be called every time `DerpScrubber.move` is
@@ -270,8 +281,9 @@ part of a video or song has been loaded.
 DerpScrubber.setAvailablePercent(percent)
 -----------------------------------------
 Sets the percentage of the bar which is available to use to the given value.
-The highlighted area will be adjusted to reflect this change. `onMove`
-callbacks are **not** called.  Defaults to 1.
+You may include a percent sign at the end of the number if it is a string.  The
+highlighted area will be adjusted to reflect this change. `onMove` callbacks
+are **not** called.  Defaults to 1.
 
 Useful for cases when only part of the bar should be useable, such as when only
 part of a video or song has been loaded.
