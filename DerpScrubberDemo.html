@@ -45,7 +45,7 @@
     scrubber = new DerpScrubber({
      width: "100%", height: "24px", barSize: "8px", outerBG: "#F2F1F0",
      barBG: "#777", highlightBG: "#A00", availableBG: "#999",
-     handle:$("<span></span>").html("&nbsp;Drag me!&nbsp;")
+     handle: $("<span></span>").html("&nbsp;Drag me!&nbsp;")
     }).onMove(update_text).onMove(function(info) {
      scrubber2.move(String(info.percent) + "%");
     }).setAvailablePercent(80).appendTo("#scrubber");
