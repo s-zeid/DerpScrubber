@@ -410,8 +410,8 @@ The default value is `true`.  **Always use this method.  NEVER set the
 DerpScrubber.setEnabled(bool)
 -----------------------------
 Enables or disables the scrubber bar based on the boolean value given.  The
-default value is `false.`  **Always use this method or `DerpScrubber.enable()`
-and `DerpScrubber.disable().  NEVER set the `enabled` property directly.**
+default value is `false`.  **Always use this method or `DerpScrubber.enable()`
+and `DerpScrubber.disable()`.  NEVER set the `enabled` property directly.**
 
 
 DerpScrubber.trigger(eventType)
