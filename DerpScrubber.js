@@ -137,7 +137,11 @@ var DerpScrubber = (function() {
   this.root.append(this.outer);
   
   this.allBorders = {x: 0, y: 0};
-  this.moveCallbacks = new Array();
+  this.callbacks = {move: new Array(),
+                    moveFinished: new Array(),
+                    userMove: new Array(),
+                    userMoveFinished: new Array()
+                    };
   
   this.setClickable(clickable).setEnabled(false);
   this.root.bind("mousedown.DerpScrubber", this.makeDragHandler());
@@ -238,6 +242,16 @@ var DerpScrubber = (function() {
    return this.adjustBox();
   },
   
+  bind: function(eventType, callback) {
+   if (typeof(eventType) == "object") {
+    for (type in eventType)
+     this.bind(type, eventType[type]);
+    return this;
+   }
+   this.callbacks[eventType].push(callback);
+   return this;
+  },
+  
   disable: function() {
    this.setEnabled(false);
    return this;
@@ -326,44 +340,35 @@ var DerpScrubber = (function() {
   
   makeDragHandler: function() {
    var scrubber = this;
-   function doMove(e) {
+   function doMove(event, last) {
     // Left mouse button only
-    if (e.which != 1)
-     return;
-    if (scrubber.clickable && scrubber.enabled)
-     scrubber.move(null, e);
-    e.preventDefault(); // Prevents text from being selected
+    if (scrubber.clickable && scrubber.enabled && event.which == 1)
+     scrubber.moveUser(event, last);
+    // Prevents text from being selected
+    event.preventDefault();
    }
-   function doUnbind(e) {
+   function doUnbind(event) {
+    doMove(event, true);
     $(window).unbind("mousemove", doMove).unbind("mouseup", doUnbind);
    }
-   function handler(e) {
-    if (scrubber.clickable && scrubber.enabled)
-     doMove(e); // Allow clicking anywhere on outer to move
-    // Always do this to prevent text selection even when the scrubber is not
-    // clickable or disabled
+   function handler(event) {
+    // Allow clicking anywhere on outer to move
+    doMove(event);
     $(window).mousemove(doMove).mouseup(doUnbind);
-    e.preventDefault(); // Prevents text from being selected
    }
    return handler;
   },
   
-  move: function(position, event) {
-   var cursor, percent, position;
+  move: function(position, user, last) {
+   var cursor, percent, position, extra;
+   user = Boolean(user);
+   last = Boolean((user) ? last : true);
    if (typeof(position) == "string" && position.match(/^[0-9.]+\%$/g))
     position = (Number(position.replace("%","")) / 100)*this.getAvailableSize();
    if (typeof(position) == "string" && position != "" && Number(position) !=NaN)
     position = Number(position);
-   if (typeof(position) != "number") {
-    if (typeof(event) != "object")
-     position = 0;
-    else {
-     if (this.orientation == "horizontal")
-      position = event.pageX - this.getBarOffset();
-     else
-      position = this.getOffsetOf(this.outer) + this.getBarSize() - event.pageY;
-    }
-   }
+   if (typeof(position) != "number")
+    position = 0;
    position = Math.min(this.getAvailableSize(), Math.max(position, 0));
    percent = this.getPercent(position);
    if (this.orientation == "horizontal") {
@@ -373,7 +378,22 @@ var DerpScrubber = (function() {
     this.highlight.css("margin-top", (this.getBarSize() - position) + "px");
    }
    this.moveHandle(percent);
-   this.onMove();
+   extra = {user: user, last: last};
+   this.onMove(extra);
+   if (last) this.onMoveFinished(extra);
+   if (user) {
+    this.onUserMove(extra);
+    if (last) this.onUserMoveFinished(extra);
+   }
+   return this;
+  },
+  
+  moveUser: function(event, last) {
+   if (this.orientation == "horizontal")
+    position = event.pageX - this.getBarOffset();
+   else
+    position = this.getOffsetOf(this.outer) + this.getBarSize() - event.pageY;
+   this.move(position, true, last);
    return this;
   },
   
@@ -410,36 +430,28 @@ var DerpScrubber = (function() {
    return this.move(percent);
   },
   
+  _onEvent: function(eventType, callback) {
+   if (typeof(callback) != "function")
+    this.trigger(eventType, callback);
+   else
+    this.bind(eventType, callback);
+   return this;
+  },
+  
   onMove: function(callback) {
-   if (typeof(callback) == "undefined") {
-    var info = {
-                scrubber: this, position: this.getPosition(),
-                coefficient: this.getCoefficient(), percent: this.getPercent()
-               };
-    for (var i = 0; i < this.moveCallbacks.length; i++) {
-     this.moveCallbacks[i](info);
-    }
-   } else {
-    this.onMoveBind(callback);
-   }
-   return this;
+   return this._onEvent("move", callback);
   },
   
-  onMoveBind: function(callback) {
-   this.moveCallbacks.push(callback);
-   return this;
+  onMoveFinished: function(callback) {
+   return this._onEvent("moveFinished", callback);
   },
   
-  onMoveUnbind: function(callback) {
-   if (typeof(callback) == "undefined")
-    this.moveCallbacks.splice(0);
-   else {
-    for (var i = 0; i < this.moveCallbacks.length; i++) {
-     if (this.moveCallbacks[i] == callback)
-      this.moveCallbacks.splice(i, 1);
-    }
-   }
-   return this;
+  onUserMove: function(callback) {
+   return this._onEvent("userMove", callback);
+  },
+  
+  onUserMoveFinished: function(callback) {
+   return this._onEvent("userMoveFinished", callback);
   },
   
   prependTo: function(element) {
@@ -518,6 +530,48 @@ var DerpScrubber = (function() {
    }
    return this;
   },
+  
+  trigger: function(eventType, extra) {
+   if ($.isArray(eventType)) {
+    for (var i = 0; i < eventType.length; i++)
+     this.trigger(eventType[i]);
+    return this;
+   }
+   var info = {
+               scrubber: this, position: this.getPosition(),
+               coefficient: this.getCoefficient(), percent: this.getPercent(),
+               user: false, last: true
+              };
+   if (typeof(extra) == "object") {
+    for (key in extra)
+     info[key] = extra[key];
+   }
+   for (var i = 0; i < this.callbacks[eventType].length; i++) {
+    this.callbacks[eventType][i](info);
+   }
+  },
+  
+  unbind: function(eventType, callback) {
+   if ($.isArray(eventType)) {
+    for (var i = 0; i < eventType.length; i++)
+     this.trigger(eventType[i]);
+    return this;
+   }
+   if (typeof(eventType) == "object") {
+    for (type in eventType)
+     this.unbind(type, eventType[type]);
+    return this;
+   }
+   if (typeof(callback) == "undefined")
+    this.callbacs[eventType].splice(0);
+   else {
+    for (var i = 0; i < this.callbacks[eventType].length; i++) {
+     if (this.callbacks[eventType][i] == callback)
+      this.callbacks[eventType].splice(i, 1);
+    }
+   }
+   return this;
+  }
  };
  
  return DerpScrubber;
