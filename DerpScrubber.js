@@ -267,7 +267,8 @@ var DerpScrubber = (function() {
   },
   
   getAvailableCoefficient: function() {
-   return this.getSizeOf(this.availableArea) / this.getSizeOf(this.bar);
+   var barSize = this.getSizeOf(this.bar);
+   return (barSize > 0) ? this.getSizeOf(this.availableArea) / barSize : 1;
   },
   
   getAvailablePercent: function() {
@@ -289,8 +290,7 @@ var DerpScrubber = (function() {
   },
   
   getHandleSize: function() {
-   if (typeof(this.handle) == "undefined") return 0;
-   return this.getOuterSizeOf(this.handle);
+   return (this.handle) ? this.getOuterSizeOf(this.handle) : 0;
   },
   
   getHighlightOffset: function() {
@@ -302,9 +302,7 @@ var DerpScrubber = (function() {
   },
   
   getOffsetOf: function(element) {
-   var offset, root;
-   element = $(element);
-   root = this.root;
+   var offset;
    // All this shit is necessary to account for borders
    if (this.orientation == "horizontal") {
     offset = element.offset().left;
@@ -318,14 +316,14 @@ var DerpScrubber = (function() {
   
   getOuterSizeOf: function(element) {
    if (this.orientation == "horizontal")
-    return $(element).outerWidth();
-   return $(element).outerHeight();
+    return element.outerWidth();
+   return element.outerHeight();
   },
   
   getSizeOf: function(element) {
    if (this.orientation == "horizontal")
-    return $(element).width();
-   return $(element).height();
+    return element.width();
+   return element.height();
   },
   
   getPercent: function(position) {
@@ -341,49 +339,74 @@ var DerpScrubber = (function() {
   makeDragHandler: function() {
    var scrubber = this;
    function doMove(event, last) {
-    // Left mouse button only
-    if (scrubber.clickable && scrubber.enabled && event.which == 1)
-     scrubber.moveUser(event, last);
     // Prevents text from being selected
     event.preventDefault();
+    scrubber.moveUser(event, last);
    }
    function doUnbind(event) {
-    doMove(event, true);
+    event.preventDefault();
+    scrubber.moveUser(event, true);
     $(window).unbind("mousemove", doMove).unbind("mouseup", doUnbind);
    }
    function handler(event) {
-    // Allow clicking anywhere on outer to move
-    doMove(event);
-    $(window).mousemove(doMove).mouseup(doUnbind);
+    event.preventDefault();
+    // Left mouse button only
+    if (event.which == 1 && scrubber.clickable && scrubber.enabled) {
+     doMove(event);
+     $(window).mousemove(doMove).mouseup(doUnbind);
+    }
    }
    return handler;
   },
   
   move: function(position, user, last) {
-   var cursor, percent, position, extra;
+   var position, coeff, percent, info, extra;
+   var availableSize = this.getAvailableSize(), barSize = this.getBarSize();
    user = Boolean(user);
    last = Boolean((user) ? last : true);
-   if (typeof(position) == "string" && position.match(/^[0-9.]+\%$/g))
-    position = (Number(position.replace("%","")) / 100)*this.getAvailableSize();
-   if (typeof(position) == "string" && position != "" && Number(position) !=NaN)
-    position = Number(position);
-   if (typeof(position) != "number")
-    position = 0;
-   position = Math.min(this.getAvailableSize(), Math.max(position, 0));
-   percent = this.getPercent(position);
+   if (typeof(position) != "number") {
+    if (typeof(position) == "string" && position.match(/^[0-9.]+\%$/g))
+     position = (Number(position.replace("%","")) / 100) * availableSize;
+    else if (typeof(position) == "string" && position != "" &&
+             Number(position) != NaN)
+     position = Number(position);
+    if (typeof(position) != "number")
+     position = 0;
+   }
+   position = Math.min(availableSize, Math.max(position, 0));
+   coeff = position / availableSize;
+   percent = coeff * 100;
    if (this.orientation == "horizontal") {
     this.highlight.css("width", String(percent) + "%");
    } else {
     this.highlight.css("height", String(percent) + "%");
-    this.highlight.css("margin-top", (this.getBarSize() - position) + "px");
+    this.highlight.css("margin-top", (barSize - position) + "px");
    }
-   this.moveHandle(percent);
-   extra = {user: user, last: last};
-   this.onMove(extra);
-   if (last) this.onMoveFinished(extra);
+   this.moveHandle(percent, (barSize != NaN) ? availableSize / barSize : 1);
+   info = {scrubber: this, position: position, coefficient: coeff,
+           percent: percent, user: user, last: last};
+   this.onMove(null, info);
+   if (last) this.onMoveFinished(null, info);
    if (user) {
-    this.onUserMove(extra);
-    if (last) this.onUserMoveFinished(extra);
+    this.onUserMove(null, info);
+    if (last) this.onUserMoveFinished(null, info);
+   }
+   return this;
+  },
+  
+  moveHandle: function(percent, availableCoefficient) {
+   if (!this.handle)
+    return this;
+   if (typeof(percent) != "number")
+    percent = this.getPercent();
+   if (typeof(availableCoefficient) != "number")
+    availableCoefficient = this.getAvailableCoefficient();
+   if (this.orientation == "horizontal") {
+    percent *= availableCoefficient;
+    this.handleContainer.css("padding-left", String(percent) + "%");
+   } else {
+    percent *= availableCoefficient;
+    this.handleContainer.css("padding-top", String(percent) + "%");
    }
    return this;
   },
@@ -393,27 +416,7 @@ var DerpScrubber = (function() {
     position = event.pageX - this.getBarOffset();
    else
     position = this.getOffsetOf(this.outer) + this.getBarSize() - event.pageY;
-   this.move(position, true, last);
-   return this;
-  },
-  
-  moveHandle: function(percent) {
-   if (!this.handle)
-    return this;
-   if (typeof(percent) != "number") {
-    if (typeof(percent) == "string" && percent.match(/^[0-9.]+\%$/g))
-     percent = percent.replace("%", "");
-    else
-     percent = this.getPercent();
-   }
-   if (this.orientation == "horizontal") {
-    percent *= this.getAvailableCoefficient();
-    this.handleContainer.css("padding-left", String(percent) + "%");
-   } else {
-    percent *= this.getAvailableCoefficient();
-    this.handleContainer.css("padding-top", String(percent) + "%");
-   }
-   return this;
+   return this.move(position, true, last);
   },
   
   moveToCoefficient: function(coeff) {
@@ -430,28 +433,28 @@ var DerpScrubber = (function() {
    return this.move(percent);
   },
   
-  _onEvent: function(eventType, callback) {
+  _onEvent: function(eventType, callback, _info) {
    if (typeof(callback) != "function")
-    this.trigger(eventType, callback);
+    this.trigger(eventType, callback, _info);
    else
     this.bind(eventType, callback);
    return this;
   },
   
-  onMove: function(callback) {
-   return this._onEvent("move", callback);
+  onMove: function(callback, _info) {
+   return this._onEvent("move", callback, _info);
   },
   
-  onMoveFinished: function(callback) {
-   return this._onEvent("moveFinished", callback);
+  onMoveFinished: function(callback, _info) {
+   return this._onEvent("moveFinished", callback, _info);
   },
   
-  onUserMove: function(callback) {
-   return this._onEvent("userMove", callback);
+  onUserMove: function(callback, _info) {
+   return this._onEvent("userMove", callback, _info);
   },
   
-  onUserMoveFinished: function(callback) {
-   return this._onEvent("userMoveFinished", callback);
+  onUserMoveFinished: function(callback, _info) {
+   return this._onEvent("userMoveFinished", callback, _info);
   },
   
   prependTo: function(element) {
@@ -531,17 +534,15 @@ var DerpScrubber = (function() {
    return this;
   },
   
-  trigger: function(eventType, extra) {
+  trigger: function(eventType, extra, info) {
    if ($.isArray(eventType)) {
     for (var i = 0; i < eventType.length; i++)
      this.trigger(eventType[i]);
     return this;
    }
-   var info = {
-               scrubber: this, position: this.getPosition(),
-               coefficient: this.getCoefficient(), percent: this.getPercent(),
-               user: false, last: true
-              };
+   if (typeof(info) == "undefined")
+    info = {scrubber: this, position: this.getPosition(),
+            coefficient: this.getCoefficient(), percent: this.getPercent()};
    if (typeof(extra) == "object") {
     for (key in extra)
      info[key] = extra[key];
