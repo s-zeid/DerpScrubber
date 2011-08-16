@@ -60,19 +60,14 @@ var DerpScrubber = (function() {
   if (typeof(this.clickable) == "undefined")
    this.clickable = clickable = true;
   
-  this.handleContainer = $("<span></span>").css("position", "static");
+  this.handleContainer = $("<span></span>");
   this.handleContainer.addClass("DerpScrubber_handleContainer");
-  this.handleContainer.css("width", "100%").css("height", "100%");
+  this.handleContainer.css("position", "absolute");
+  this.handleContainer.css("top", "0").css("right", "0");
+  this.handleContainer.css("bottom", "0").css("left", "0");
+  this.handleContainer.css("width", "auto").css("height", "auto");
   this.handleContainer.css("display", "block").css("margin", "0");
-  
-  this.handleOuterContainer = $("<span></span>");
-  this.handleOuterContainer.addClass("DerpScrubber_handleOuterContainer");
-  this.handleOuterContainer.css("position", "absolute");
-  this.handleOuterContainer.css("top", "0").css("right", "0");
-  this.handleOuterContainer.css("bottom", "0").css("left", "0");
-  this.handleOuterContainer.css("width", "auto").css("height", "auto");
-  this.handleOuterContainer.css("display", "block").css("margin", "0");
-  this.handleOuterContainer.css("float", "left").css("z-index", "2");
+  this.handleContainer.css("z-index", "2");
   
   this.userHandle = typeof(handle) == "object";
   if (!this.userHandle) {
@@ -85,7 +80,10 @@ var DerpScrubber = (function() {
   }
   if (this.handle) {
    this.handle.addClass("DerpScrubber_handle");
-   this.handle.css("display", "inline-block").css("position", "static");
+   this.handle.css("display", "inline-block").css("position", "absolute");
+   this.handle.css("position", "absolute");
+   this.handle.css("top", "auto").css("right", "auto");
+   this.handle.css("bottom", "auto").css("left", "auto");
    this.handle.css("margin", "0").css("overflow", "hidden");
    this.handleContainer.append(this.handle);
   }
@@ -110,14 +108,21 @@ var DerpScrubber = (function() {
   if (barBG) this.bar.css("background", barBG);
   
   this.outer = $("<span></span>").addClass("DerpScrubber_outer");
-  this.outer.css("display", "block").css("position", "relative");
+  this.outer.css("display", "block").css("position", "absolute");
   this.outer.css("top", "0").css("right", "0");
   this.outer.css("bottom", "0").css("left", "0");
-  this.outer.css("width", "100%").css("height", "100%");
+  this.outer.css("width", "auto").css("height", "auto");
   this.outer.css("margin", "0").css("overflow", "hidden");
   
+  this.container = $("<span></span>").addClass("DerpScrubber_container");
+  this.container.css("display", "block").css("position", "relative");
+  this.container.css("top", "0").css("right", "0");
+  this.container.css("bottom", "0").css("left", "0");
+  this.container.css("width", "100%").css("height", "100%");
+  this.container.css("margin", "0").css("overflow", "hidden");
+  
   this.root = $("<span></span>").addClass("DerpScrubber");
-  this.root.css("display", "inline-block");
+  this.root.css("display", "inline-block").css("text-align", "left");
   this.root.css("width", width).css("height", height);
   if (outerBG) this.root.css("background", outerBG);
   
@@ -131,10 +136,10 @@ var DerpScrubber = (function() {
   
   this.availableArea.append(this.highlight);
   this.bar.append(this.availableArea);
-  this.handleOuterContainer.append(this.handleContainer);
-  this.outer.append(this.handleOuterContainer);
   this.outer.append(this.bar);
-  this.root.append(this.outer);
+  this.container.append(this.outer);
+  this.container.append(this.handleContainer);
+  this.root.append(this.container);
   
   this.allBorders = {x: 0, y: 0};
   this.callbacks = {move: new Array(),
@@ -153,49 +158,14 @@ var DerpScrubber = (function() {
   adjustBox: function() {
    var outer = this.outer, bar = this.bar, root = this.root, center;
    var handle = this.handle, container = this.container, handleMargin;
+   var handleOffset;
    this.highlight.css("display", "block");
-   this.handleOuterContainer.css("display", "block");
+   this.handleContainer.css("display", "block");
    if (this.orientation == "horizontal") {
-    if (handle) {
-     if (!this.userHandle) {
-      handle.css("width", this.handleContainer.height() / 2);
-      if (!handle.height()) this.handle.css("height", this.height);
-      handleBorderX = Math.abs(handle.outerWidth() - handle.width());
-      handleBorderY = Math.abs(handle.outerHeight() - handle.height());
-      handle.css("width", handle.width() - handleBorderX);
-      handle.css("height", handle.height() - handleBorderY);
-     }
-     center = this.getHandleSize() / 2;
-     handleMargin = (this.outer.height() - this.handle.outerHeight()) / 2;
-     handle.css("margin-top", String(Math.floor(handleMargin) + "px"));
-     handle.css("margin-left", String(-center) + "px");
-     bar.css("left", String(center) + "px");
-     bar.css("right", String(center) + "px");
-     this.handleOuterContainer.css("left", String(center) + "px");
-     this.handleOuterContainer.css("right", String(center) + "px");
-    }
     this.highlight.css("width", "0%");
     if (typeof(this.barSize) == "string")
      bar.css("height", this.barSize);
    } else {
-    if (handle) {
-     if (!this.userHandle) {
-      if (!handle.width()) this.handle.css("width", this.width);
-      handle.css("height", this.handleContainer.width() / 2);
-      handleBorderX = Math.abs(handle.outerWidth() - handle.width());
-      handleBorderY = Math.abs(handle.outerHeight() - handle.height());
-      handle.css("width", handle.width() - handleBorderX);
-      handle.css("height", handle.height() - handleBorderY);
-     }
-     center = this.getHandleSize() / 2;
-     handleMargin = (this.outer.height() - this.handle.outerHeight()) / 2;
-     handle.css("margin-left", String(Math.floor(handleMargin) + "px"));
-     handle.css("margin-top", String(-center) + "px");
-     bar.css("top", String(center) + "px");
-     bar.css("bottom", String(center) + "px");
-     handleOuterContainer.css("top", String(center) + "px");
-     handleOuterContainer.css("bottom", String(center) + "px");
-    }
     this.highlight.css("height", "0%");
     if (typeof(this.barSize) == "string")
      bar.css("width", this.barSize);
@@ -230,8 +200,47 @@ var DerpScrubber = (function() {
     bar.css("left", Math.max(barMarginX, 0) + "px");
     bar.css("right", Math.max(barMarginX, 0) + "px");
    }
+    if (handle) {
+     if (this.orientation == "horizontal") {
+      if (!this.userHandle) {
+       handle.css("width", this.handleContainer.height() / 2);
+       if (!handle.height()) this.handle.css("height", this.height);
+       handleBorderX = Math.abs(handle.outerWidth() - handle.width());
+       handleBorderY = Math.abs(handle.outerHeight() - handle.height());
+       handle.css("width", handle.width() - handleBorderX);
+       handle.css("height", handle.height() - handleBorderY);
+      }
+      center = this.getHandleSize() / 2;
+      handleMargin = (this.container.height() - this.handle.outerHeight()) / 2;
+      handle.css("margin-top", String(Math.floor(handleMargin) + "px"));
+      handle.css("margin-left", String(-center) + "px");
+      bar.css("left", String(center) + "px");
+      bar.css("right", String(center) + "px");
+      handleOffset = this.getBarOffset()-this.getOffsetOf(this.handleContainer);
+      this.handleContainer.css("left", String(handleOffset) + "px");
+      this.handleContainer.css("right", String(handleOffset) + "px");
+     } else {
+      if (!this.userHandle) {
+       if (!handle.width()) this.handle.css("width", this.width);
+       handle.css("height", this.handleContainer.width() / 2);
+       handleBorderX = Math.abs(handle.outerWidth() - handle.width());
+       handleBorderY = Math.abs(handle.outerHeight() - handle.height());
+       handle.css("width", handle.width() - handleBorderX);
+       handle.css("height", handle.height() - handleBorderY);
+      }
+      center = this.getHandleSize() / 2;
+      handleMargin = (this.container.width() - this.handle.outerwidth()) / 2;
+      handle.css("margin-left", String(Math.floor(handleMargin) + "px"));
+      handle.css("margin-top", String(-center) + "px");
+      bar.css("top", String(center) + "px");
+      bar.css("bottom", String(center) + "px");
+      handleOffset = this.getBarOffset()-this.getOffsetOf(this.handleContainer);
+      handleContainer.css("top", String(handleOffset) + "px");
+      handleContainer.css("bottom", String(handleOffset) + "px");
+     }
+    }
    if (this.enabled) {
-    this.handleOuterContainer.css("display",(this.clickable)? "block" : "none");
+    this.handleContainer.css("display",(this.clickable)? "block" : "none");
     this.highlight.css("display", "none");
    }
    return this;
@@ -403,10 +412,10 @@ var DerpScrubber = (function() {
     availableCoefficient = this.getAvailableCoefficient();
    if (this.orientation == "horizontal") {
     percent *= availableCoefficient;
-    this.handleContainer.css("padding-left", String(percent) + "%");
+    this.handle.css("left", String(percent) + "%");
    } else {
     percent *= availableCoefficient;
-    this.handleContainer.css("padding-top", String(percent) + "%");
+    this.handle.css("top", String(percent) + "%");
    }
    return this;
   },
@@ -470,6 +479,7 @@ var DerpScrubber = (function() {
   reset: function() {
    this.disable();
    this.move(0);
+   this.setAvailableSize("100%");
    return this;
   },
   
@@ -492,7 +502,7 @@ var DerpScrubber = (function() {
    if (typeof(size) == "number")
     size = String(Math.min(0, Math.max(size / this.getBarSize(), 1))) + "%";
    else if (typeof(size) != "string" || !size.match(/^[0-9.]+\%$/g))
-    if (percent == null || percent == "" || Number(size) == NaN)
+    if (percent == null || percent == "" || String(Number(size)) == NaN)
      size = "100%";
    var percent = this.getPercent();
    if (this.orientation == "horizontal")
@@ -506,11 +516,11 @@ var DerpScrubber = (function() {
   setClickable: function(clickable) {
    this.clickable = Boolean(clickable);
    if (clickable) {
-    this.handleOuterContainer.css("display", (this.enabled) ? "block" : "none");
+    this.handleContainer.css("display", (this.enabled) ? "block" : "none");
     this.root.removeClass("DerpScrubber_notClickable");
     this.root.addClass("DerpScrubber_clickable");
    } else {
-    this.handleOuterContainer.css("display", "none");
+    this.handleContainer.css("display", "none");
     this.root.removeClass("DerpScrubber_clickable");
     this.root.addClass("DerpScrubber_notClickable");
    }
@@ -520,14 +530,14 @@ var DerpScrubber = (function() {
   setEnabled: function(enabled) {
    this.enabled = Boolean(enabled);
    if (enabled) {
-    if (this.clickable) this.handleOuterContainer.css("display", "block");
+    if (this.clickable) this.handleContainer.css("display", "block");
     this.highlight.css("display", "block");
     this.onMove();
     this.root.removeClass("DerpScrubber_disabled");
     this.root.addClass("DerpScrubber_enabled");
    } else {
     this.highlight.css("display", "none");
-    this.handleOuterContainer.css("display", "none");
+    this.handleContainer.css("display", "none");
     this.root.removeClass("DerpScrubber_enabled");
     this.root.addClass("DerpScrubber_disabled");
    }

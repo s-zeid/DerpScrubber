@@ -48,19 +48,19 @@ CSS Classes
 The following CSS classes are available for you to use for theming purposes:
 
  * `DerpScrubber` - the root element of the scrubber bar
-    * `DerpScrubber_outer` - the element containing the main bar and handle
-      containers
-       * `DerpScrubber_handleOuterContainer` - the outer container of the handle
-          * `DerpScrubber_handleContainer` - the inner container of the handle
-             * `DerpScrubber_handle` - the handle of the scrubber bar
-       * `DerpScrubber_bar` - the main scrubber bar
-          * `DerpScrubber_availableArea` - the portion of the bar which is
-            available to use
-             * `DerpScrubber_highlight` - the highlighted portion of the
-               available area
+    * `DerpScrubber_container` - contains all other elements
+       * `DerpScrubber_outer` - contains the main scrubber bar
+          * `DerpScrubber_bar` - the main scrubber bar
+             * `DerpScrubber_availableArea` - the portion of the bar which is
+               available to use
+                * `DerpScrubber_highlight` - the highlighted portion of the
+                  available area
+       * `DerpScrubber_handleContainer` - contains the handle
+          * `DerpScrubber_handle` - the handle of the scrubber bar
 
-These elements are nested as shown above.  **Do not change the `position` or
-`display` properties of these elements.**
+These elements are nested as shown above.  **Do not change the `position`,
+`display`, `margin*`, `padding*`, or any other properties related to the size
+or position of these elements, except for border-related properties.**
 
 The following classes are available depending on the state of the scrubber bar:
  * `DerpScrubber_enabled`
