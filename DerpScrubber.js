@@ -80,8 +80,7 @@ var DerpScrubber = (function() {
   }
   if (this.handle) {
    this.handle.addClass("DerpScrubber_handle");
-   this.handle.css("display", "inline-block").css("position", "absolute");
-   this.handle.css("position", "absolute");
+   this.handle.css("display", "inline-block").css("position", "relative");
    this.handle.css("top", "auto").css("right", "auto");
    this.handle.css("bottom", "auto").css("left", "auto");
    this.handle.css("margin", "0").css("overflow", "hidden");
@@ -89,13 +88,17 @@ var DerpScrubber = (function() {
   }
   
   this.highlight = $("<span></span>").addClass("DerpScrubber_highlight");
-  this.highlight.css("display", "block").css("position", "static");
+  this.highlight.css("display", "block").css("position", "absolute");
+  this.highlight.css("top", "0").css("right", "0");
+  this.highlight.css("bottom", "0").css("left", "0");
   this.highlight.css("width", "100%").css("height", "100%");
   this.highlight.css("margin", "0")
   if (highlightBG) this.highlight.css("background", highlightBG);
   
   this.availableArea =$("<span></span>").addClass("DerpScrubber_availableArea");
-  this.availableArea.css("display", "block").css("position", "static");
+  this.availableArea.css("display", "block").css("position", "absolute");
+  this.availableArea.css("top", "0").css("right", "0");
+  this.availableArea.css("bottom", "0").css("left", "0");
   this.availableArea.css("width", "100%").css("height", "100%");
   this.availableArea.css("margin", "0")
   if (availableBG) this.availableArea.css("background", availableBG);
@@ -134,8 +137,8 @@ var DerpScrubber = (function() {
   this.root.addClass("DerpScrubber_" + this.orientation);
   this.root.addClass("DerpScrubber_" + ((handle) ? "hasHandle" : "noHandle"));
   
-  this.availableArea.append(this.highlight);
   this.bar.append(this.availableArea);
+  this.bar.append(this.highlight);
   this.outer.append(this.bar);
   this.container.append(this.outer);
   this.container.append(this.handleContainer);
@@ -163,10 +166,14 @@ var DerpScrubber = (function() {
    this.handleContainer.css("display", "block");
    if (this.orientation == "horizontal") {
     this.highlight.css("width", "0%");
+    this.highlight.css("right", "auto");
+    this.availableArea.css("right", "auto");
     if (typeof(this.barSize) == "string")
      bar.css("height", this.barSize);
    } else {
     this.highlight.css("height", "0%");
+    this.highlight.css("top", "auto");
+    this.availableArea.css("top", "auto");
     if (typeof(this.barSize) == "string")
      bar.css("width", this.barSize);
    }
@@ -200,45 +207,45 @@ var DerpScrubber = (function() {
     bar.css("left", Math.max(barMarginX, 0) + "px");
     bar.css("right", Math.max(barMarginX, 0) + "px");
    }
-    if (handle) {
-     if (this.orientation == "horizontal") {
-      if (!this.userHandle) {
-       handle.css("width", this.handleContainer.height() / 2);
-       if (!handle.height()) this.handle.css("height", this.height);
-       handleBorderX = Math.abs(handle.outerWidth() - handle.width());
-       handleBorderY = Math.abs(handle.outerHeight() - handle.height());
-       handle.css("width", handle.width() - handleBorderX);
-       handle.css("height", handle.height() - handleBorderY);
-      }
-      center = this.getHandleSize() / 2;
-      handleMargin = (this.container.height() - this.handle.outerHeight()) / 2;
-      handle.css("margin-top", String(Math.floor(handleMargin) + "px"));
-      handle.css("margin-left", String(-center) + "px");
-      bar.css("left", String(center) + "px");
-      bar.css("right", String(center) + "px");
-      handleOffset = this.getBarOffset()-this.getOffsetOf(this.handleContainer);
-      this.handleContainer.css("left", String(handleOffset) + "px");
-      this.handleContainer.css("right", String(handleOffset) + "px");
-     } else {
-      if (!this.userHandle) {
-       if (!handle.width()) this.handle.css("width", this.width);
-       handle.css("height", this.handleContainer.width() / 2);
-       handleBorderX = Math.abs(handle.outerWidth() - handle.width());
-       handleBorderY = Math.abs(handle.outerHeight() - handle.height());
-       handle.css("width", handle.width() - handleBorderX);
-       handle.css("height", handle.height() - handleBorderY);
-      }
-      center = this.getHandleSize() / 2;
-      handleMargin = (this.container.width() - this.handle.outerwidth()) / 2;
-      handle.css("margin-left", String(Math.floor(handleMargin) + "px"));
-      handle.css("margin-top", String(-center) + "px");
-      bar.css("top", String(center) + "px");
-      bar.css("bottom", String(center) + "px");
-      handleOffset = this.getBarOffset()-this.getOffsetOf(this.handleContainer);
-      handleContainer.css("top", String(handleOffset) + "px");
-      handleContainer.css("bottom", String(handleOffset) + "px");
+   if (handle) {
+    if (this.orientation == "horizontal") {
+     if (!this.userHandle) {
+      handle.css("width", this.handleContainer.height() / 2);
+      if (!handle.height()) this.handle.css("height", this.height);
+      handleBorderX = Math.abs(handle.outerWidth() - handle.width());
+      handleBorderY = Math.abs(handle.outerHeight() - handle.height());
+      handle.css("width", handle.width() - handleBorderX);
+      handle.css("height", handle.height() - handleBorderY);
      }
+     center = this.getHandleSize() / 2;
+     handleMargin = (this.container.height() - this.handle.outerHeight()) / 2;
+     handle.css("margin-top", String(Math.floor(handleMargin) + "px"));
+     handle.css("margin-left", String(-center) + "px");
+     bar.css("left", String(center) + "px");
+     bar.css("right", String(center) + "px");
+     handleOffset = this.getBarOffset()-this.getOffsetOf(this.handleContainer);
+     this.handleContainer.css("left", String(handleOffset) + "px");
+     this.handleContainer.css("right", String(handleOffset) + "px");
+    } else {
+     if (!this.userHandle) {
+      if (!handle.width()) this.handle.css("width", this.width);
+      handle.css("height", this.handleContainer.width() / 2);
+      handleBorderX = Math.abs(handle.outerWidth() - handle.width());
+      handleBorderY = Math.abs(handle.outerHeight() - handle.height());
+      handle.css("width", handle.width() - handleBorderX);
+      handle.css("height", handle.height() - handleBorderY);
+     }
+     center = this.getHandleSize() / 2;
+     handleMargin = (this.container.width() - this.handle.outerwidth()) / 2;
+     handle.css("margin-left", String(Math.floor(handleMargin) + "px"));
+     handle.css("margin-top", String(-center) + "px");
+     bar.css("top", String(center) + "px");
+     bar.css("bottom", String(center) + "px");
+     handleOffset = this.getBarOffset()-this.getOffsetOf(this.handleContainer);
+     handleContainer.css("top", String(handleOffset) + "px");
+     handleContainer.css("bottom", String(handleOffset) + "px");
     }
+   }
    if (this.enabled) {
     this.handleContainer.css("display",(this.clickable)? "block" : "none");
     this.highlight.css("display", "none");
@@ -287,7 +294,7 @@ var DerpScrubber = (function() {
   getCoefficient: function(position) {
    if (typeof(position) != "number" && !this.enabled) return null;
    if (typeof(position) != "number") position = this.getPosition();
-   return position / this.getAvailableSize();
+   return position / this.getBarSize();
   },
   
   getBarOffset: function() {
@@ -370,28 +377,26 @@ var DerpScrubber = (function() {
   
   move: function(position, user, last) {
    var position, coeff, percent, info, extra;
-   var availableSize = this.getAvailableSize(), barSize = this.getBarSize();
+   var barSize = this.getBarSize();
    user = Boolean(user);
    last = Boolean((user) ? last : true);
    if (typeof(position) != "number") {
     if (typeof(position) == "string" && position.match(/^[0-9.]+\%$/g))
-     position = (Number(position.replace("%","")) / 100) * availableSize;
+     position = (Number(position.replace("%","")) / 100) * barSize;
     else if (typeof(position) == "string" && position != "" &&
              Number(position) != NaN)
      position = Number(position);
     if (typeof(position) != "number")
      position = 0;
    }
-   position = Math.min(availableSize, Math.max(position, 0));
-   coeff = position / availableSize;
+   position = Math.min(barSize, Math.max(position, 0));
+   coeff = position / ((barSize) ? barSize : position);
    percent = coeff * 100;
-   if (this.orientation == "horizontal") {
+   if (this.orientation == "horizontal")
     this.highlight.css("width", String(percent) + "%");
-   } else {
+   else
     this.highlight.css("height", String(percent) + "%");
-    this.highlight.css("margin-top", (barSize - position) + "px");
-   }
-   this.moveHandle(percent, (barSize != NaN) ? availableSize / barSize : 1);
+   this.moveHandle(percent);
    info = {scrubber: this, position: position, coefficient: coeff,
            percent: percent, user: user, last: last};
    this.onMove(null, info);
@@ -403,20 +408,15 @@ var DerpScrubber = (function() {
    return this;
   },
   
-  moveHandle: function(percent, availableCoefficient) {
+  moveHandle: function(percent) {
    if (!this.handle)
     return this;
    if (typeof(percent) != "number")
     percent = this.getPercent();
-   if (typeof(availableCoefficient) != "number")
-    availableCoefficient = this.getAvailableCoefficient();
-   if (this.orientation == "horizontal") {
-    percent *= availableCoefficient;
+   if (this.orientation == "horizontal")
     this.handle.css("left", String(percent) + "%");
-   } else {
-    percent *= availableCoefficient;
+   else
     this.handle.css("top", String(percent) + "%");
-   }
    return this;
   },
   
@@ -504,12 +504,10 @@ var DerpScrubber = (function() {
    else if (typeof(size) != "string" || !size.match(/^[0-9.]+\%$/g))
     if (percent == null || percent == "" || String(Number(size)) == NaN)
      size = "100%";
-   var percent = this.getPercent();
    if (this.orientation == "horizontal")
     this.availableArea.css("width", size);
    else
     this.availableArea.css("height", size);
-   this.moveHandle(String(percent) + "%");
    return this;
   },
   

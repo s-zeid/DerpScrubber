@@ -292,8 +292,8 @@ Sets the size of the highlighted area to the given position, or 0 if it is
 null, then calls all registered `onMove` callback functions.
 
 If the position is a string value of the format `<decimal number>%`, then it
-will be interpreted as a percentage of the **available** bar space, not the
-entire bar space.
+will be interpreted as a percentage of the **entire** bar space, not just the
+available bar space.
 
 If `position` is null and a JavaScript event object is passed as `event`, then
 the cursor position will be used to determine the size of the highlighted area.
@@ -304,13 +304,13 @@ completeness.
 DerpScrubber.moveToCoefficient(coeff)
 -------------------------------------
 Sets the size of the highlighted area to the given number, **times 100,** as a
-percentage of the available bar space.
+percentage of the entire bar space.
 
 
 DerpScrubber.moveToPercent(percent)
 -----------------------------------
-Sets the size of the highlighted area to the given percentage of the available
-bar space.  You may include a percent sign at the end of the number if it is a
+Sets the size of the highlighted area to the given percentage of the entire bar
+space.  You may include a percent sign at the end of the number if it is a
 string.
 
 
