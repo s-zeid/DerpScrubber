@@ -149,6 +149,7 @@ var DerpScrubber = (function() {
                     userMove: new Array(),
                     userMoveFinished: new Array()
                     };
+  this.userMoveLock = false;
   
   this.setClickable(clickable).setEnabled(false);
   this.root.bind("mousedown.DerpScrubber", this.makeDragHandler());
@@ -379,6 +380,8 @@ var DerpScrubber = (function() {
    var barSize = this.getBarSize();
    user = Boolean(user);
    last = Boolean((user) ? last : true);
+   if (!user && this.userMoveLock)
+    return this;
    if (typeof(position) != "number") {
     if (typeof(position) == "string" && position.match(/^[0-9.]+\%$/g))
      position = (Number(position.replace("%","")) / 100) * barSize;
@@ -399,8 +402,10 @@ var DerpScrubber = (function() {
    info = {scrubber: this, position: position, coefficient: coeff,
            percent: percent, user: user, last: last};
    this.onMove(null, info);
-   if (last) this.onMoveFinished(null, info);
-   if (user) {
+   if (last) {
+    this.onMoveFinished(null, info);
+    this.userMoveLock = false;
+   } if (user) {
     this.onUserMove(null, info);
     if (last) this.onUserMoveFinished(null, info);
    }
@@ -420,6 +425,7 @@ var DerpScrubber = (function() {
   },
   
   moveUser: function(event, last) {
+   this.userMoveLock = true;
    if (this.orientation == "horizontal")
     position = event.pageX - this.getBarOffset();
    else
@@ -531,6 +537,7 @@ var DerpScrubber = (function() {
     this.availableArea.css("display", "block");
     this.highlight.css("display", "block");
     this.onMove();
+    this.onMoveFinished();
     this.root.removeClass("DerpScrubber_disabled");
     this.root.addClass("DerpScrubber_enabled");
    } else {

@@ -119,8 +119,11 @@ DerpScrubber API
 ================
 
 This is a listing of all properties and methods of the DerpScrubber class which
-are intended for public use.  Any properties and methods not listed here are
-used internally and should be used or manipulated at your own risk.
+are intended for public use.  All methods, including constructors, may be
+chained unless a return value is explicitly specified.
+
+Any properties and methods not listed here are used internally and should be
+used or manipulated at your own risk.
 
 
 DerpScrubber(settings)
@@ -283,11 +286,11 @@ DerpScrubber.getPosition()
 --------------------------
 Returns the current size in pixels of the highlighted area.  Try to use
 `DerpScrubber.getPercent()` or `DerpScrubber.getCoefficient()` instead, **as
-you will not receive `onMove` updates when the browser window is resized.**
+you will not receive updates when the browser window is resized.**
 
 
-DerpScrubber.move([position=0, [event=null]])
----------------------------------------------
+DerpScrubber.move([position=0])
+-------------------------------
 Sets the size of the highlighted area to the given position, or 0 if it is
 null, then calls all registered `onMove` callback functions.
 
@@ -300,11 +303,17 @@ the cursor position will be used to determine the size of the highlighted area.
 This is mainly intended for internal use, and is only documented here for
 completeness.
 
+If the user is currently moving the scrubber bar, then this method will
+silently fail without triggering any move-related events.
+
 
 DerpScrubber.moveToCoefficient(coeff)
 -------------------------------------
 Sets the size of the highlighted area to the given number, **times 100,** as a
 percentage of the entire bar space.
+
+If the user is currently moving the scrubber bar, then this method will
+silently fail without triggering any move-related events.
 
 
 DerpScrubber.moveToPercent(percent)
@@ -312,6 +321,9 @@ DerpScrubber.moveToPercent(percent)
 Sets the size of the highlighted area to the given percentage of the entire bar
 space.  You may include a percent sign at the end of the number if it is a
 string.
+
+If the user is currently moving the scrubber bar, then this method will
+silently fail without triggering any move-related events.
 
 
 DerpScrubber.onMove([callback])
@@ -356,14 +368,14 @@ argument to the jQuery constructor.
 DerpScrubber.reset()
 --------------------
 Resets the scrubber bar to its original, disabled state, with the position set
-to zero.  `onMove` callbacks will be called.
+to zero.  Move-related events will be triggered.
 
 
 DerpScrubber.setAvailableCoefficient(coeff)
 -------------------------------------------
 Sets the percentage of the bar which is available to use to the given value
 **times 100.**  The highlighted area will be adjusted to reflect this change.
-`onMove` callbacks are **not** called.  Defaults to 1.
+Move-related events are **not** triggered.  Defaults to 1.
 
 Useful for cases when only part of the bar should be useable, such as when only
 part of a video or song has been loaded.  
@@ -373,8 +385,8 @@ DerpScrubber.setAvailablePercent(percent)
 -----------------------------------------
 Sets the percentage of the bar which is available to use to the given value.
 You may include a percent sign at the end of the number if it is a string.  The
-highlighted area will be adjusted to reflect this change. `onMove` callbacks
-are **not** called.  Defaults to 1.
+highlighted area will be adjusted to reflect this change.  Move-related events
+are **not** triggered.  Defaults to 100%.
 
 Useful for cases when only part of the bar should be useable, such as when only
 part of a video or song has been loaded.
@@ -383,8 +395,8 @@ part of a video or song has been loaded.
 DerpScrubber.setAvailableSize(size)
 -----------------------------------
 Sets the size of the bar which is available to use to the given value.  The
-highlighted area will be adjusted to reflect this change.  `onMove`
-callbacks are **not** called.  Defaults to 100%.
+highlighted area will be adjusted to reflect this change.  Move-related events
+are **not** triggered.  Defaults to 100%.
 
 Useful for cases when only part of the bar should be useable, such as when only
 part of a video or song has been loaded.
