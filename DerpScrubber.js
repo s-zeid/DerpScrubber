@@ -406,9 +406,11 @@ var DerpScrubber = (function() {
     this.onMoveFinished(null, info);
    if (user) {
     this.onUserMove(null, info);
-    if (last) this.onUserMoveFinished(null, info);
+    if (last) {
+     this.onUserMoveFinished(null, info);
+     this.userMoveLock = false;
+    }
    }
-   if (last) this.userMoveLock = false;
    return this;
   },
   
