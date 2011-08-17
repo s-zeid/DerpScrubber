@@ -247,8 +247,8 @@ var DerpScrubber = (function() {
     }
    }
    if (this.enabled) {
-    this.handleContainer.css("display",(this.clickable)? "block" : "none");
-    this.highlight.css("display", "none");
+    this.handleContainer.css("display", (this.clickable) ? "block" : "none");
+    this.highlight.css("display", "block");
    }
    return this;
   },
@@ -529,11 +529,13 @@ var DerpScrubber = (function() {
    this.enabled = Boolean(enabled);
    if (enabled) {
     if (this.clickable) this.handleContainer.css("display", "block");
+    this.availableArea.css("display", "block");
     this.highlight.css("display", "block");
     this.onMove();
     this.root.removeClass("DerpScrubber_disabled");
     this.root.addClass("DerpScrubber_enabled");
    } else {
+    this.availableArea.css("display", "none");
     this.highlight.css("display", "none");
     this.handleContainer.css("display", "none");
     this.root.removeClass("DerpScrubber_enabled");
