@@ -402,13 +402,13 @@ var DerpScrubber = (function() {
    info = {scrubber: this, position: position, coefficient: coeff,
            percent: percent, user: user, last: last};
    this.onMove(null, info);
-   if (last) {
+   if (last)
     this.onMoveFinished(null, info);
-    this.userMoveLock = false;
-   } if (user) {
+   if (user) {
     this.onUserMove(null, info);
     if (last) this.onUserMoveFinished(null, info);
    }
+   if (last) this.userMoveLock = false;
    return this;
   },
   
