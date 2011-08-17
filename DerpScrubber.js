@@ -67,7 +67,6 @@ var DerpScrubber = (function() {
   this.handleContainer.css("bottom", "0").css("left", "0");
   this.handleContainer.css("width", "auto").css("height", "auto");
   this.handleContainer.css("display", "block").css("margin", "0");
-  this.handleContainer.css("z-index", "2");
   
   this.userHandle = typeof(handle) == "object";
   if (!this.userHandle) {
