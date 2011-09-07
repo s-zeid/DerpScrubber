@@ -62,7 +62,9 @@ These elements are nested as shown above.  **Do not change the `position`,
 `display`, `margin*`, `padding*`, or any other properties related to the size
 or position of these elements, except for border-related properties.**
 
-The following classes are available depending on the state of the scrubber bar:
+The following classes are available on the root element depending on the state
+of the scrubber bar:
+
  * `DerpScrubber_enabled`
  * `DerpScrubber_disabled`
  * `DerpScrubber_clickable`
